@@ -49,7 +49,7 @@ function CreatePocketPage() {
         toast.dismiss(loadingToast);
 
         if (res && !res.success) {
-            toast.error("Failed to create pocket");
+            toast.error(res.error ? `Failed: ${res.error}` : "Failed to create pocket");
             setLoading(false);
             return;
         }
