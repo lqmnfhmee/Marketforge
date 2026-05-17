@@ -145,11 +145,26 @@ export function PocketProvider({
     const createPocket =
         async (pocket) => {
 
-            if (!user) {
+            // Fetch the authenticated user directly to ensure correct ID
+            const { data: { user: currentUser } } = await supabase.auth.getUser();
+
+            if (!currentUser) {
 
                 return {
                     success: false,
+                    error: "Not authenticated",
                 };
+            }
+
+            const payload = {
+                user_id: currentUser.id,
+                name: pocket.name,
+                goal_amount: pocket.goal_amount || 0,
+                balance: pocket.balance || 0,
+            };
+
+            if (pocket.image) {
+                payload.image = pocket.image;
             }
 
             const {
@@ -157,25 +172,7 @@ export function PocketProvider({
                 error,
             } = await supabase
                 .from("pockets")
-                .insert([
-                    {
-                        user_id:
-                            user.id,
-
-                        name:
-                            pocket.name,
-
-                        image:
-                            pocket.image,
-
-                        goal:
-                            pocket.goal || 0,
-
-                        balance:
-                            pocket.balance ||
-                            0,
-                    },
-                ])
+                .insert([payload])
                 .select()
                 .single();
 

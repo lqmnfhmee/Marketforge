@@ -41,7 +41,7 @@ function CreatePocketPage() {
 
         const res = await createPocket({
             name,
-            goal: Number(goal),
+            goal_amount: Number(goal),
             balance: Number(balance),
             image: selectedImage,
         });
