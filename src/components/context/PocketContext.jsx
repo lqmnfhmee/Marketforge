@@ -159,7 +159,7 @@ export function PocketProvider({
             const payload = {
                 user_id: currentUser.id,
                 name: pocket.name,
-                goal_amount: pocket.goal_amount || 0,
+                goal: pocket.goal || 0,
                 balance: pocket.balance || 0,
             };
 

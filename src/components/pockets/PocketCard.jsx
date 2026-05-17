@@ -62,7 +62,7 @@ function PocketCard({
             </p>
 
             {/* Goal */}
-            {pocket.goal_amount > 0 && (
+            {pocket.goal > 0 && (
 
                 <div className="mt-4">
 
@@ -85,7 +85,7 @@ function PocketCard({
                                 width: `${Math.min(
                                     (
                                         pocket.balance /
-                                        pocket.goal_amount
+                                        pocket.goal
                                     ) * 100,
                                     100
                                 )
@@ -103,7 +103,7 @@ function PocketCard({
             "
                     >
                         Goal:{" "}
-                        {pocket.goal_amount.toLocaleString()}
+                        {pocket.goal.toLocaleString()}
                     </p>
 
                 </div>
