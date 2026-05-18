@@ -7,11 +7,12 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import Skeleton, { SkeletonTheme } from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
+import { supabase } from "../lib/supabase";
 
 function PocketDetailsPage() {
     const { id } = useParams();
     const navigate = useNavigate();
-    const { pockets, loading, depositToPocket, withdrawFromPocket, updatePocket, closePocket } = usePockets();
+    const { pockets, loading, depositToPocket, withdrawFromPocket, updatePocket, closePocket, fetchPockets } = usePockets();
     const pocket = pockets.find((p) => p.id === Number(id));
 
     const [amount, setAmount] = useState("");
@@ -52,7 +53,8 @@ function PocketDetailsPage() {
 
     const openSettings = () => {
         setNewName(pocket.name || "");
-        setNewGoal(pocket.goal_amount || pocket.goal || "");
+        const goalVal = pocket.goal_amount !== undefined && pocket.goal_amount !== null ? pocket.goal_amount : pocket.goal;
+        setNewGoal(goalVal ? Number(goalVal).toLocaleString() : "");
         setShowCloseConfirm(false);
         setMode("settings");
     };
@@ -72,19 +74,28 @@ function PocketDetailsPage() {
     };
 
     const handleUpdateGoal = async () => {
-        const val = Number(newGoal);
-        if (isNaN(val) || val < 0) {
+        const parsedGoalAmount = Number(String(newGoal).replace(/,/g, ''));
+        if (isNaN(parsedGoalAmount) || parsedGoalAmount < 0) {
             toast.error("Invalid goal amount");
             return;
         }
         setSubmitting(true);
         const loadingToast = toast.loading("Saving...");
-        const { success, error } = await updatePocket(pocket.id, { goal_amount: val });
+        
+        const { error } = await supabase
+            .from("pockets")
+            .update({
+                goal_amount: parsedGoalAmount,
+            })
+            .eq("id", pocket.id);
+            
         toast.dismiss(loadingToast);
-        if (success) {
-            toast.success("Goal updated");
+        
+        if (error) {
+            toast.error(error.message);
         } else {
-            toast.error(error || "Failed to update goal");
+            toast.success("Goal updated");
+            await fetchPockets();
         }
         setSubmitting(false);
     };
@@ -262,11 +273,11 @@ function PocketDetailsPage() {
                                     <div className="flex gap-3">
                                         <input 
                                             type="text" 
-                                            value={newGoal === '' ? '' : Number(newGoal).toLocaleString()} 
+                                            value={newGoal} 
                                             onChange={(e) => {
                                                 const rawValue = e.target.value.replace(/,/g, '');
                                                 if (/^\d*$/.test(rawValue)) {
-                                                    setNewGoal(rawValue ? Number(rawValue) : '');
+                                                    setNewGoal(rawValue ? Number(rawValue).toLocaleString() : '');
                                                 }
                                             }}
                                             className="input-fantasy flex-1 font-bold text-lg"
@@ -278,7 +289,7 @@ function PocketDetailsPage() {
                                             disabled={submitting}
                                             className="btn-primary py-2 px-6 disabled:opacity-50"
                                         >
-                                            Save
+                                            {submitting ? "Saving..." : "Save"}
                                         </button>
                                     </div>
                                     {(pocket.goal_amount > 0 || pocket.goal > 0) && (

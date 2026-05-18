@@ -37,18 +37,18 @@ function PocketCard({
             </p>
 
             {/* Goal */}
-            {pocket.goal > 0 && (
+            {(pocket.goal_amount > 0 || pocket.goal > 0) && (
                 <div className="relative z-10 mt-5 w-full">
                     <div className="w-full bg-[#0b0f19] h-2.5 rounded-full overflow-hidden border border-[#1a1f2e]">
                         <div
                             className="h-full rounded-full bg-gradient-to-r from-[#fbbf24] to-[#f59e0b] shadow-[0_0_10px_rgba(251,191,36,0.5)]"
                             style={{
-                                width: `${Math.min((pocket.balance / pocket.goal) * 100, 100)}%`,
+                                width: `${Math.min((pocket.balance / (pocket.goal_amount || pocket.goal)) * 100, 100)}%`,
                             }}
                         />
                     </div>
                     <p className="text-xs text-slate-400 mt-2 uppercase tracking-wider font-bold font-[Inter]">
-                        Goal: {pocket.goal.toLocaleString()}
+                        Goal: {(pocket.goal_amount || pocket.goal).toLocaleString()}
                     </p>
                 </div>
             )}
