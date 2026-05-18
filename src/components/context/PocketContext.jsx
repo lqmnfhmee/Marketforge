@@ -74,10 +74,12 @@ export function PocketProvider({
            Fetch Activities
         ----------------------------- */
 
+        const activePockets = pocketsData.filter(p => p.is_archived !== true);
+
         const pocketsWithActivities =
             await Promise.all(
 
-                pocketsData.map(
+                activePockets.map(
                     async (pocket) => {
 
                         const {
@@ -357,6 +359,50 @@ export function PocketProvider({
             await fetchPockets();
         };
 
+    /* -----------------------------
+       Update Pocket (Settings)
+    ----------------------------- */
+
+    const updatePocket = async (pocketId, updates) => {
+        if (!user) return { success: false, error: "Not authenticated" };
+
+        const { error } = await supabase
+            .from("pockets")
+            .update(updates)
+            .eq("id", pocketId)
+            .eq("user_id", user.id);
+
+        if (error) {
+            console.error("updatePocket error:", error);
+            return { success: false, error: error.message };
+        }
+
+        await fetchPockets();
+        return { success: true };
+    };
+
+    /* -----------------------------
+       Close Pocket (Archive)
+    ----------------------------- */
+
+    const closePocket = async (pocketId) => {
+        if (!user) return { success: false, error: "Not authenticated" };
+
+        const { error } = await supabase
+            .from("pockets")
+            .update({ is_archived: true })
+            .eq("id", pocketId)
+            .eq("user_id", user.id);
+
+        if (error) {
+            console.error("closePocket error:", error);
+            return { success: false, error: error.message };
+        }
+
+        await fetchPockets();
+        return { success: true };
+    };
+
     return (
 
         <PocketContext.Provider
@@ -371,6 +417,10 @@ export function PocketProvider({
                 depositToPocket,
 
                 withdrawFromPocket,
+
+                updatePocket,
+
+                closePocket,
             }}
         >
 

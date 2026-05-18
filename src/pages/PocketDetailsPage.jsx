@@ -1,6 +1,6 @@
 import PocketPerformanceChart from "../components/pockets/PocketPerformanceChart";
-import { useParams } from "react-router-dom";
-import { Plus, ArrowDown, Settings } from "lucide-react";
+import { useParams, useNavigate } from "react-router-dom";
+import { Plus, ArrowDown, Settings, X } from "lucide-react";
 import Sidebar from "../config/Sidebar";
 import { usePockets } from "../components/context/PocketContext";
 import { useState } from "react";
@@ -10,12 +10,17 @@ import "react-loading-skeleton/dist/skeleton.css";
 
 function PocketDetailsPage() {
     const { id } = useParams();
-    const { pockets, loading, depositToPocket, withdrawFromPocket } = usePockets();
+    const navigate = useNavigate();
+    const { pockets, loading, depositToPocket, withdrawFromPocket, updatePocket, closePocket } = usePockets();
     const pocket = pockets.find((p) => p.id === Number(id));
 
     const [amount, setAmount] = useState("");
     const [mode, setMode] = useState(null);
     const [submitting, setSubmitting] = useState(false);
+
+    const [newName, setNewName] = useState("");
+    const [newGoal, setNewGoal] = useState("");
+    const [showCloseConfirm, setShowCloseConfirm] = useState(false);
 
     if (loading) {
         return (
@@ -44,6 +49,59 @@ function PocketDetailsPage() {
     if (!pocket) {
         return <div className="text-white p-10">Pocket not found</div>;
     }
+
+    const openSettings = () => {
+        setNewName(pocket.name || "");
+        setNewGoal(pocket.goal_amount || pocket.goal || "");
+        setShowCloseConfirm(false);
+        setMode("settings");
+    };
+
+    const handleRename = async () => {
+        if (!newName.trim() || newName.trim() === pocket.name) return;
+        setSubmitting(true);
+        const loadingToast = toast.loading("Saving...");
+        const { success, error } = await updatePocket(pocket.id, { name: newName.trim() });
+        toast.dismiss(loadingToast);
+        if (success) {
+            toast.success("Pocket renamed");
+        } else {
+            toast.error(error || "Failed to rename");
+        }
+        setSubmitting(false);
+    };
+
+    const handleUpdateGoal = async () => {
+        const val = Number(newGoal);
+        if (isNaN(val) || val < 0) {
+            toast.error("Invalid goal amount");
+            return;
+        }
+        setSubmitting(true);
+        const loadingToast = toast.loading("Saving...");
+        const { success, error } = await updatePocket(pocket.id, { goal_amount: val });
+        toast.dismiss(loadingToast);
+        if (success) {
+            toast.success("Goal updated");
+        } else {
+            toast.error(error || "Failed to update goal");
+        }
+        setSubmitting(false);
+    };
+
+    const handleClosePocket = async () => {
+        setSubmitting(true);
+        const loadingToast = toast.loading("Closing pocket...");
+        const { success, error } = await closePocket(pocket.id);
+        toast.dismiss(loadingToast);
+        if (success) {
+            toast.success("Pocket closed");
+            navigate("/pockets");
+        } else {
+            toast.error(error || "Failed to close pocket");
+            setSubmitting(false);
+        }
+    };
 
     const handleSubmit = async () => {
         const value = Number(amount);
@@ -117,14 +175,17 @@ function PocketDetailsPage() {
                             <ArrowDown size={32} className="mx-auto group-hover:text-[#9f1239] transition-colors" />
                             <h2 className="text-sm sm:text-xl font-bold mt-3 sm:mt-4" style={{ fontFamily: "'Cinzel', serif" }}>Withdraw</h2>
                         </button>
-                        <button className="bg-[#111827] border border-[#1a1f2e] hover:border-[#fbbf24]/50 rounded-3xl p-5 sm:p-8 text-slate-300 hover:text-white hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(251,191,36,0.1)] transition-all duration-300 group">
+                        <button 
+                            onClick={openSettings}
+                            className="bg-[#111827] border border-[#1a1f2e] hover:border-[#fbbf24]/50 rounded-3xl p-5 sm:p-8 text-slate-300 hover:text-white hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(251,191,36,0.1)] transition-all duration-300 group"
+                        >
                             <Settings size={32} className="mx-auto group-hover:text-slate-400 transition-colors" />
                             <h2 className="text-sm sm:text-xl font-bold mt-3 sm:mt-4" style={{ fontFamily: "'Cinzel', serif" }}>Settings</h2>
                         </button>
                     </div>
 
                     {/* Deposit / Withdraw Modal */}
-                    {mode && (
+                    {(mode === "deposit" || mode === "withdraw") && (
                         <div className="form-panel mt-8">
                             <div className="relative z-10 max-w-xl mx-auto">
                                 <h2 className="text-2xl sm:text-3xl text-white font-bold text-center tracking-wide mb-6" style={{ fontFamily: "'Cinzel', serif" }}>
@@ -156,6 +217,107 @@ function PocketDetailsPage() {
                                 >
                                     Cancel
                                 </button>
+                            </div>
+                        </div>
+                    )}
+
+                    {mode === "settings" && (
+                        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity duration-300">
+                            <div className="form-panel max-w-md w-full relative z-10 border border-[#fbbf24]/20 shadow-[0_0_40px_rgba(251,191,36,0.1)] p-6 sm:p-8">
+                                <button 
+                                    onClick={() => setMode(null)}
+                                    className="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors"
+                                >
+                                    <X size={24} />
+                                </button>
+                                <h2 className="text-2xl sm:text-3xl text-white font-bold text-center tracking-wide mb-6" style={{ fontFamily: "'Cinzel', serif" }}>
+                                    Pocket Settings
+                                </h2>
+
+                                {/* Rename Pocket */}
+                                <div className="mb-6 pb-6 border-b border-[#1a1f2e]">
+                                    <label className="block text-sm text-slate-400 font-bold mb-2 font-[Inter] uppercase tracking-wider">Rename Pocket</label>
+                                    <div className="flex gap-3">
+                                        <input 
+                                            type="text" 
+                                            value={newName} 
+                                            onChange={(e) => setNewName(e.target.value)} 
+                                            className="input-fantasy flex-1 font-bold text-lg"
+                                            style={{ fontFamily: "'Cinzel', serif" }}
+                                            placeholder="New Pocket Name"
+                                        />
+                                        <button 
+                                            onClick={handleRename}
+                                            disabled={submitting || !newName.trim() || newName.trim() === pocket.name}
+                                            className="btn-primary py-2 px-6 disabled:opacity-50"
+                                        >
+                                            Save
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Edit Goal */}
+                                <div className="mb-6 pb-6 border-b border-[#1a1f2e]">
+                                    <label className="block text-sm text-slate-400 font-bold mb-2 font-[Inter] uppercase tracking-wider">Target Goal (Silver)</label>
+                                    <div className="flex gap-3">
+                                        <input 
+                                            type="text" 
+                                            value={newGoal === '' ? '' : Number(newGoal).toLocaleString()} 
+                                            onChange={(e) => {
+                                                const rawValue = e.target.value.replace(/,/g, '');
+                                                if (/^\d*$/.test(rawValue)) {
+                                                    setNewGoal(rawValue ? Number(rawValue) : '');
+                                                }
+                                            }}
+                                            className="input-fantasy flex-1 font-bold text-lg"
+                                            style={{ fontFamily: "'Cinzel', serif" }}
+                                            placeholder="E.g. 10,000,000"
+                                        />
+                                        <button 
+                                            onClick={handleUpdateGoal}
+                                            disabled={submitting}
+                                            className="btn-primary py-2 px-6 disabled:opacity-50"
+                                        >
+                                            Save
+                                        </button>
+                                    </div>
+                                    {(pocket.goal_amount > 0 || pocket.goal > 0) && (
+                                        <p className="text-xs text-[#fbbf24] mt-2 font-[Inter] font-bold">Current Goal: {(pocket.goal_amount || pocket.goal).toLocaleString()} Silver</p>
+                                    )}
+                                </div>
+
+                                {/* Close Pocket */}
+                                <div className="mt-8">
+                                    <label className="block text-sm text-[#9f1239] font-bold mb-2 font-[Inter] uppercase tracking-wider">Danger Zone</label>
+                                    {!showCloseConfirm ? (
+                                        <button 
+                                            onClick={() => setShowCloseConfirm(true)}
+                                            className="w-full bg-[#111827] border border-[#9f1239]/30 hover:border-[#9f1239] hover:bg-[#9f1239]/10 text-[#9f1239] rounded-xl py-3 font-bold transition-all duration-300 font-[Cinzel]"
+                                        >
+                                            Close Pocket
+                                        </button>
+                                    ) : (
+                                        <div className="bg-[#9f1239]/10 border border-[#9f1239]/50 rounded-xl p-4 text-center">
+                                            <p className="text-slate-300 mb-4 font-[Inter] text-sm">Are you sure you want to close this pocket? This action cannot be undone.</p>
+                                            <div className="flex gap-3">
+                                                <button 
+                                                    onClick={() => setShowCloseConfirm(false)}
+                                                    className="flex-1 bg-[#111827] border border-[#1a1f2e] text-slate-300 hover:text-white rounded-lg py-2 transition-colors font-bold font-[Cinzel]"
+                                                    disabled={submitting}
+                                                >
+                                                    Cancel
+                                                </button>
+                                                <button 
+                                                    onClick={handleClosePocket}
+                                                    disabled={submitting}
+                                                    className="flex-1 bg-[#9f1239] hover:bg-[#be123c] text-white rounded-lg py-2 transition-colors font-bold font-[Cinzel] disabled:opacity-50"
+                                                >
+                                                    {submitting ? "Closing..." : "Confirm Close"}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     )}
