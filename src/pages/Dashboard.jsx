@@ -39,34 +39,21 @@ function HeroHeader() {
     }
     setIsEditing(false);
     setEditAmount("");
-  };
+  };  return (
+    <div className="relative w-full mx-auto pt-12 pb-14 px-4 flex flex-col items-center justify-center">
 
-  return (
-    <div className="relative w-full max-w-5xl mx-auto pt-6 pb-6 px-4 sm:px-8">
-      {/* Gold badge — sits inline on mobile, top-right on desktop */}
-      <div className="self-end mb-4 sm:mb-0 sm:absolute sm:top-12 sm:right-12 z-20 flex justify-end">
-        <GoldCard />
-      </div>
+      <div className="relative z-10 flex flex-col items-center text-center group w-full">
+        <p className="text-slate-400 text-sm font-bold tracking-[0.25em] uppercase mb-4 font-[Inter]">
+          Total Net Worth
+        </p>
 
-      <div className="bg-[#111827] rounded-3xl p-8 sm:p-12 relative overflow-hidden border border-[#1a1f2e] shadow-[0_8px_30px_rgb(0,0,0,0.4)] group transition-all duration-500 hover:shadow-[0_8px_40px_rgba(255,215,0,0.05)] hover:border-[rgba(255,215,0,0.08)]">
-        {/* Glow effect background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-[#1a1f2e] to-[#0b0f19] opacity-80 pointer-events-none" />
-        <div className="absolute -top-24 -left-24 w-64 h-64 bg-slate-400/5 blur-[100px] rounded-full pointer-events-none group-hover:bg-slate-300/10 transition-colors duration-700" />
-        
-        <div className="relative z-10 flex flex-col items-center sm:items-start text-center sm:text-left">
-          <p className="text-[#9ca3af] text-[11px] font-bold tracking-[0.2em] uppercase mb-4 font-[Inter] flex items-center gap-2">
-            <span className="w-8 h-px bg-gradient-to-r from-transparent to-[#4b5563] hidden sm:block"></span>
-            Total Net Worth
-            <span className="w-8 h-px bg-gradient-to-l from-transparent to-[#4b5563] hidden sm:block"></span>
-          </p>
-
-          {/* Balance — editable */}
+        {/* Balance — editable */}
           {isEditing ? (
-            <div className="flex flex-wrap items-center gap-3 mb-6 justify-center sm:justify-start">
+            <div className="flex flex-wrap items-center justify-center gap-3 mb-6">
               <input
                 type="text"
                 autoFocus
-                className="bg-[#0b0f19] text-3xl sm:text-5xl font-bold text-white px-4 sm:px-6 py-3 rounded-2xl outline-none w-full max-w-xs sm:w-80 border border-[#1a1f2e] focus:border-slate-500 transition-colors text-center sm:text-left shadow-inner"
+                className="input-fantasy text-4xl sm:text-6xl font-bold text-white px-4 sm:px-6 py-3 text-center bg-black/20"
                 style={{ fontFamily: "'Cinzel', serif" }}
                 placeholder="New balance"
                 value={
@@ -101,26 +88,27 @@ function HeroHeader() {
               </button>
             </div>
           ) : (
-            <div className="flex items-center gap-4 group/edit mb-6 relative">
-              <div className="relative hidden sm:block">
-                <div className="absolute inset-0 bg-slate-300 blur-xl opacity-20 rounded-full scale-150 group-hover:opacity-30 transition-opacity"></div>
-                <CircleDollarSign size={56} className="text-slate-300 relative z-10 drop-shadow-[0_0_15px_rgba(203,213,225,0.4)]" strokeWidth={1.5} />
+            <div className="flex items-center justify-center gap-4 group/edit mb-4 relative">
+              <div className="relative">
+                <div className="absolute inset-0 bg-slate-300 blur-2xl opacity-10 rounded-full scale-150 group-hover:opacity-20 transition-opacity"></div>
+                <CircleDollarSign size={56} className="text-slate-300 relative z-10 drop-shadow-md" strokeWidth={1.5} />
               </div>
-              <div className="flex flex-col sm:flex-row items-center gap-3">
-                <CircleDollarSign size={48} className="text-slate-300 sm:hidden mb-1 relative z-10 drop-shadow-[0_0_15px_rgba(203,213,225,0.4)]" strokeWidth={1.5} />
-                <h1 
-                  className="text-5xl sm:text-7xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-b from-white via-slate-200 to-slate-400"
-                  style={{ fontFamily: "'Cinzel', serif" }}
-                >
-                  {silverBalance.toLocaleString()}
-                </h1>
+              <h1 
+                className="text-6xl sm:text-[5rem] font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-b from-white via-slate-100 to-slate-400 drop-shadow-lg leading-none"
+                style={{ fontFamily: "'Cinzel', serif" }}
+              >
+                {silverBalance.toLocaleString()}
+              </h1>
+              
+              <div className="self-start mt-1 sm:mt-2 -ml-2">
+                <GoldCard />
               </div>
               <button
                 onClick={() => {
                   setEditAmount(silverBalance.toString());
                   setIsEditing(true);
                 }}
-                className="p-2.5 sm:ml-4 opacity-0 group-hover/edit:opacity-100 transition-all duration-300 bg-[#1a1f2e] border border-white/5 rounded-xl hover:bg-[#1f2937] hover:border-white/10 hover:scale-110 shadow-lg absolute -right-12 sm:static top-2"
+                className="p-2.5 ml-4 opacity-0 group-hover/edit:opacity-100 transition-all duration-300 bg-black/40 border border-white/10 rounded-xl hover:bg-black/60 hover:border-white/20 hover:scale-110 shadow-lg absolute -right-16 top-1/2 -translate-y-1/2"
                 title="Edit Balance"
               >
                 <Edit2 size={20} className="text-slate-300" />
@@ -130,21 +118,20 @@ function HeroHeader() {
 
           {/* Weekly profit */}
           <div
-            className={`inline-flex items-center gap-2 text-sm sm:text-base font-semibold px-4 py-2 rounded-full border bg-black/20 backdrop-blur-sm transition-colors duration-300 ${
+            className={`inline-flex items-center gap-2 text-base font-bold transition-colors duration-300 ${
               isPositive 
-                ? "text-[#10b981] border-[#10b981]/20 group-hover:border-[#10b981]/40 group-hover:bg-[#10b981]/10 shadow-[0_0_15px_rgba(16,185,129,0.05)]" 
-                : "text-[#9f1239] border-[#9f1239]/20 group-hover:border-[#9f1239]/40 group-hover:bg-[#9f1239]/10 shadow-[0_0_15px_rgba(159,18,57,0.05)]"
+                ? "text-[#10b981] drop-shadow-[0_0_8px_rgba(16,185,129,0.3)]" 
+                : "text-[#9f1239] drop-shadow-[0_0_8px_rgba(159,18,57,0.3)]"
             }`}
             style={{ fontFamily: "'Inter', sans-serif" }}
           >
-            {isPositive ? <TrendingUp size={18} /> : <TrendingDown size={18} />}
+            {isPositive ? <TrendingUp size={20} /> : <TrendingDown size={20} />}
             <span>
               {isPositive ? "+" : ""}
               {weeklyChange.toLocaleString()} this week
             </span>
           </div>
         </div>
-      </div>
     </div>
   );
 }
@@ -158,8 +145,8 @@ function Dashboard() {
   const isLoading = walletLoading || pocketLoading;
 
   return (
-    <SkeletonTheme baseColor="#1e293b" highlightColor="#334155">
-      <div className="flex bg-[#0f172a] min-h-screen">
+    <SkeletonTheme baseColor="#0f172a" highlightColor="#1e293b">
+      <div className="flex min-h-screen bg-transparent">
         <Sidebar />
 
         {/* Push content down on mobile to clear the fixed top bar */}

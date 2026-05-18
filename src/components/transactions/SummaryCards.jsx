@@ -52,21 +52,16 @@ function SummaryCards() {
                 return (
                     <div
                         key={index}
-                        className="
-              bg-[#1e293b]
-              rounded-3xl
-              p-6
-              text-white
-            "
+                        className="form-panel flex flex-col justify-between"
                     >
                         <div className="flex justify-between items-center">
 
                             <div>
-                                <p className="text-gray-400">
+                                <p className="text-sm font-semibold tracking-wide text-slate-400 uppercase">
                                     {card.title}
                                 </p>
 
-                                <h1 className="text-3xl font-bold mt-2">
+                                <h1 className="font-cinzel text-2xl sm:text-3xl font-bold text-white mt-1">
                                     {card.value}
                                 </h1>
                             </div>

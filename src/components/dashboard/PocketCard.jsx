@@ -14,15 +14,9 @@ function PocketCard() {
   return (
     <button
       onClick={() => navigate("/pockets")}
-      className="
-        group relative w-full text-left bg-[#111827] rounded-3xl p-8 
-        border border-[#1a1f2e] overflow-hidden transition-all duration-500
-        hover:shadow-[0_8px_30px_rgba(255,215,0,0.05)] hover:border-[rgba(255,215,0,0.08)]
-        hover:-translate-y-1 flex flex-col justify-between h-full min-h-[300px]
-      "
+      className="form-panel text-left flex flex-col justify-between h-full min-h-[300px] group"
     >
-      {/* Background Gradients & Glows */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#1a1f2e] to-[#0b0f19] opacity-80 pointer-events-none" />
+      {/* Background Glows */}
       <div className="absolute top-0 right-0 w-64 h-64 bg-slate-400/5 blur-[80px] rounded-full pointer-events-none group-hover:bg-slate-400/10 transition-colors duration-700" />
       
       {/* Header */}

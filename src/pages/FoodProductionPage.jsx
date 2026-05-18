@@ -6,7 +6,7 @@ import FoodProductionCalculator
 function FoodProductionPage() {
 
     return (
-        <div className="flex bg-[#0f172a] min-h-screen">
+        <div className="flex bg-transparent min-h-screen">
 
             <Sidebar />
 

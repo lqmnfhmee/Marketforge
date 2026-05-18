@@ -65,16 +65,9 @@ function TransactionForm() {
 
     return (
 
-        <div
-            className="
-                bg-[#1e293b]
-                rounded-3xl
-                p-6
-                text-white
-            "
-        >
+        <div className="form-panel">
 
-            <h2 className="text-2xl font-bold">
+            <h2 className="text-2xl font-bold font-cinzel text-transparent bg-clip-text bg-gradient-to-r from-slate-200 to-slate-400">
                 Quick Transaction
             </h2>
 
@@ -89,11 +82,12 @@ function TransactionForm() {
                         flex-1
                         py-3
                         rounded-xl
-                        transition
+                        transition-all
+                        font-medium
 
                         ${type === "expense"
-                            ? "bg-red-500 text-white"
-                            : "bg-[#0f172a]"
+                            ? "bg-red-500/20 text-red-400 border border-red-500/50 shadow-[0_0_15px_rgba(239,68,68,0.2)]"
+                            : "bg-black/20 text-slate-400 border border-transparent hover:bg-black/40"
                         }
                     `}
                 >
@@ -108,11 +102,12 @@ function TransactionForm() {
                         flex-1
                         py-3
                         rounded-xl
-                        transition
+                        transition-all
+                        font-medium
 
                         ${type === "income"
-                            ? "bg-green-500 text-white"
-                            : "bg-[#0f172a]"
+                            ? "bg-green-500/20 text-green-400 border border-green-500/50 shadow-[0_0_15px_rgba(34,197,94,0.2)]"
+                            : "bg-black/20 text-slate-400 border border-transparent hover:bg-black/40"
                         }
                     `}
                 >
@@ -131,13 +126,7 @@ function TransactionForm() {
                             e.target.value
                         )
                     }
-                    className="
-                        w-full
-                        bg-[#0f172a]
-                        p-3
-                        rounded-xl
-                        outline-none
-                    "
+                    className="input-fantasy"
                 >
 
                     <option>
@@ -208,13 +197,7 @@ function TransactionForm() {
                             );
                         }
                     }}
-                    className="
-                        w-full
-                        bg-[#0f172a]
-                        p-3
-                        rounded-xl
-                        outline-none
-                    "
+                    className="input-fantasy"
                 />
 
                 <textarea
@@ -225,17 +208,7 @@ function TransactionForm() {
                             e.target.value
                         )
                     }
-                    className="
-                        w-full
-                        bg-[#0f172a]
-                        p-3
-                        rounded-xl
-                        outline-none
-                        resize-none
-                        h-28
-                        flex -1
-                        
-                    "
+                    className="input-fantasy resize-none h-28"
                 />
 
             </div>
@@ -243,18 +216,7 @@ function TransactionForm() {
             <button
                 onClick={handleSubmit}
                 disabled={loading}
-                className="
-                    w-full
-                    bg-blue-500
-                    py-3
-                    rounded-xl
-                    mt-6
-                    font-semibold
-                    hover:scale-[1.02]
-                    transition
-                    disabled:opacity-50
-                    disabled:cursor-not-allowed
-                "
+                className="w-full btn-primary mt-6"
             >
                 {loading ? "Saving..." : "Add Transaction"}
             </button>

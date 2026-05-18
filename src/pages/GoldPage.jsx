@@ -87,8 +87,8 @@ function GoldPage() {
   };
 
   return (
-    <SkeletonTheme baseColor="#1e293b" highlightColor="#334155">
-      <div className="flex bg-[#0f172a] min-h-screen">
+    <SkeletonTheme baseColor="#0f172a" highlightColor="#1e293b">
+      <div className="flex bg-transparent min-h-screen">
         <Sidebar />
 
         {/* offset for mobile nav bars */}

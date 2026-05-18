@@ -11,8 +11,8 @@ function TransactionsPage() {
     const { loading } = useWallet();
 
     return (
-        <SkeletonTheme baseColor="#1e293b" highlightColor="#334155">
-            <div className="flex bg-[#0f172a] min-h-screen">
+        <SkeletonTheme baseColor="#0b101c" highlightColor="#1a1f2e">
+            <div className="flex bg-transparent min-h-screen">
 
                 {/* Sidebar */}
                 <Sidebar />
@@ -23,7 +23,7 @@ function TransactionsPage() {
                     <div className="max-w-7xl mx-auto">
 
                         {/* Page Header */}
-                        <h1 className="text-3xl sm:text-4xl font-bold text-white">
+                        <h1 className="text-3xl sm:text-4xl font-bold font-cinzel text-transparent bg-clip-text bg-gradient-to-r from-[#fbbf24] to-[#f59e0b]">
                             Transactions
                         </h1>
 

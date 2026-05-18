@@ -99,9 +99,8 @@ function WeeklyProfitChart() {
     const isPositiveWeek = weeklyProfit >= 0;
 
     return (
-        <div className="group relative w-full h-full bg-[#111827] rounded-3xl p-6 sm:p-8 border border-[#1a1f2e] overflow-hidden transition-all duration-500 hover:shadow-[0_8px_30px_rgba(255,215,0,0.05)] hover:border-[rgba(255,215,0,0.08)] flex flex-col min-h-[400px]">
-            {/* Background Gradients */}
-            <div className="absolute inset-0 bg-gradient-to-br from-[#1a1f2e] to-[#0b0f19] opacity-50 pointer-events-none" />
+        <div className="form-panel flex flex-col min-h-[400px] h-full group">
+            {/* Background handled by form-panel */}
             
             <div className="relative z-10 flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
                 <div className="flex items-center gap-3">

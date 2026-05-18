@@ -60,7 +60,7 @@ function CreatePocketPage() {
     };
 
     return (
-        <div className="flex bg-[#0b0f19] min-h-screen">
+        <div className="flex bg-transparent min-h-screen">
             <Sidebar />
 
             <div className="flex-1 p-4 sm:p-8 pt-18 lg:pt-8 pb-24 lg:pb-8">

@@ -31,8 +31,8 @@ function PocketsPage() {
         );
 
     return (
-        <SkeletonTheme baseColor="#1e293b" highlightColor="#334155">
-            <div className="flex bg-[#0f172a] min-h-screen">
+        <SkeletonTheme baseColor="#0b101c" highlightColor="#1a1f2e">
+            <div className="flex bg-transparent min-h-screen">
 
                 <Sidebar />
 
@@ -42,11 +42,11 @@ function PocketsPage() {
                     <div className="max-w-7xl mx-auto">
 
                         {/* Header */}
-                        <h1 className="text-3xl sm:text-4xl font-bold text-white">
+                        <h1 className="text-3xl sm:text-4xl font-bold font-cinzel text-transparent bg-clip-text bg-gradient-to-r from-[#fbbf24] to-[#f59e0b]">
                             Pocket Savings
                         </h1>
 
-                        <p className="text-gray-400 mt-2">
+                        <p className="text-gray-400 mt-2 text-sm uppercase tracking-widest font-[Inter]">
                             Total Pocket Balance
                         </p>
 
@@ -54,42 +54,22 @@ function PocketsPage() {
                         {loading ? (
                             <Skeleton height={180} borderRadius={28} className="mt-8" />
                         ) : (
-                            <div
-                                className="
-                                    bg-[#1e293b]
-                                    rounded-3xl
-                                    p-6 sm:p-8
-                                    text-white
-                                    mt-8
-                                "
-                            >
-
-                                <h1 className="text-4xl sm:text-5xl font-bold">
-                                    {totalSavings.toLocaleString()}
-                                </h1>
-
-                                <p className="text-gray-400 mt-2">
-                                    {pockets.length} Active Pockets
-                                </p>
+                            <div className="form-panel mt-8 flex flex-col sm:flex-row items-center sm:items-start justify-between">
+                                <div className="text-center sm:text-left">
+                                    <h1 className="text-5xl sm:text-6xl font-bold font-cinzel text-transparent bg-clip-text bg-gradient-to-b from-white via-slate-100 to-slate-400 drop-shadow-lg leading-none">
+                                        {totalSavings.toLocaleString()}
+                                    </h1>
+                                    <p className="text-gray-400 mt-3 text-sm uppercase tracking-widest font-[Inter]">
+                                        {pockets.length} Active Pockets
+                                    </p>
+                                </div>
 
                                 <button
-                                    onClick={() =>
-                                        navigate(
-                                            "/pockets/create"
-                                        )
-                                    }
-                                    className="
-                                        bg-purple-500
-                                        px-6
-                                        py-3
-                                        rounded-2xl
-                                        mt-6
-                                        font-semibold
-                                    "
+                                    onClick={() => navigate("/pockets/create")}
+                                    className="btn-primary mt-6 sm:mt-0"
                                 >
                                     Create Pocket
                                 </button>
-
                             </div>
                         )}
 

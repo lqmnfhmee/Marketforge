@@ -20,7 +20,7 @@ function PocketDetailsPage() {
     if (loading) {
         return (
             <SkeletonTheme baseColor="#1e293b" highlightColor="#334155">
-                <div className="flex bg-[#0f172a] min-h-screen">
+                <div className="flex bg-transparent min-h-screen">
                     <Sidebar />
                     <div className="flex-1 p-4 sm:p-8 pt-18 lg:pt-8 pb-24 lg:pb-8">
                         <div className="max-w-6xl mx-auto space-y-6">
@@ -79,7 +79,7 @@ function PocketDetailsPage() {
     };
 
     return (
-        <div className="flex bg-[#0b0f19] min-h-screen">
+        <div className="flex bg-transparent min-h-screen">
             <Sidebar />
 
             <div className="flex-1 p-4 sm:p-8 pt-18 lg:pt-8 pb-24 lg:pb-8">

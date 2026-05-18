@@ -126,9 +126,9 @@ function SellingSetup(props) {
                                 {/* Remove */}
                                 <button
                                     onClick={() => props.removeListing(index)}
-                                    className="col-span-2 sm:col-span-1 btn-danger !p-0 flex items-center justify-center !min-h-0"
+                                    className="col-span-2 sm:col-span-1 flex items-center justify-center text-slate-500 hover:text-[#f43f5e] transition-colors"
                                 >
-                                    <Trash2 size={16} />
+                                    <Trash2 size={20} />
                                 </button>
                             </div>
                         ))}
