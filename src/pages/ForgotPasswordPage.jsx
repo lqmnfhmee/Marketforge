@@ -52,7 +52,7 @@ function ForgotPasswordPage() {
               WebkitTextFillColor: "transparent" 
             }}
           >
-            Albion Finance
+            Marketforge
           </h1>
           <h2 className="text-[11px] font-bold text-gray-500 uppercase tracking-widest mb-8 text-center" style={{ fontFamily: "'Inter', sans-serif" }}>
             Reset Password

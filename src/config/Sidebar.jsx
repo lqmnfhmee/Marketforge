@@ -98,7 +98,7 @@ function Sidebar() {
               WebkitTextFillColor: "transparent" 
             }}
           >
-            Albion Finance
+            Marketforge
           </h1>
           <p className="text-[10px] uppercase tracking-widest text-[#9ca3af] mt-1 font-medium">
             Guild Management Interface
@@ -191,7 +191,7 @@ function Sidebar() {
             WebkitTextFillColor: "transparent" 
           }}
         >
-          Albion Finance
+          Marketforge
         </h1>
         <button
           onClick={() => setMobileOpen(true)}
@@ -234,7 +234,7 @@ function Sidebar() {
                     WebkitTextFillColor: "transparent" 
                   }}
                 >
-                  Albion Finance
+                  Marketforge
                 </h1>
                 <p className="text-[9px] uppercase tracking-widest text-[#9ca3af] mt-1 font-medium">
                   Guild Management
