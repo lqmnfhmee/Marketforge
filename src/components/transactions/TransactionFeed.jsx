@@ -1,11 +1,20 @@
+import { useState } from "react";
 import { useWallet } from "../context/WalletContext";
 import TransactionItem from "./TransactionItem";
 
 function TransactionFeed() {
     const { transactions } = useWallet();
+    const [searchTerm, setSearchTerm] = useState("");
+
+    const filteredTransactions = transactions.filter((t) => {
+        const term = searchTerm.toLowerCase();
+        const matchesCategory = t.category?.toLowerCase().includes(term);
+        const matchesNote = t.note?.toLowerCase().includes(term);
+        return matchesCategory || matchesNote;
+    });
 
     // Limit to latest 15 transactions
-    const latestTransactions = [...transactions].reverse().slice(0, 15);
+    const latestTransactions = [...filteredTransactions].reverse().slice(0, 15);
 
     return (
         <div className="form-panel flex flex-col h-[600px] relative">
@@ -13,12 +22,14 @@ function TransactionFeed() {
             {/* Static Header */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shrink-0 mb-6 z-10">
                 <h2 className="font-cinzel text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-slate-200 to-slate-400">
-                    Transaction Feed
+                    Transaction History
                 </h2>
 
                 <input
                     placeholder="Search..."
                     className="input-fantasy py-2 px-4 w-full sm:w-64"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
                 />
             </div>
 
