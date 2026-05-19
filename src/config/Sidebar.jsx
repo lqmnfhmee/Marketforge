@@ -321,7 +321,7 @@ function Sidebar() {
       )}
 
       {/* ── Mobile: Bottom Nav Bar ── */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#03050a]/95 backdrop-blur-md border-t border-[rgba(251,191,36,0.08)] flex items-center justify-around py-2 px-1 pb-[env(safe-area-inset-bottom)] shadow-[0_-10px_40px_rgba(0,0,0,0.8)]">
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#03050a]/95 backdrop-blur-md border-t border-[rgba(251,191,36,0.08)] flex items-center justify-around py-3 px-2 pb-[calc(env(safe-area-inset-bottom)+12px)] shadow-[0_-10px_40px_rgba(0,0,0,0.8)]">
         {allMenuItems.map((item, index) => {
           const Icon = item.icon;
           const isActive = location.pathname === item.path;
@@ -330,17 +330,17 @@ function Sidebar() {
               key={index}
               onClick={() => navigate(item.path)}
               className={`
-                flex flex-col items-center gap-1 px-3 py-2 rounded-xl transition-all duration-300
+                flex flex-col items-center gap-1.5 px-3 py-2 rounded-xl transition-all duration-300 w-16
                 ${isActive ? "text-[#fbbf24]" : "text-gray-500 hover:text-gray-300"}
               `}
             >
               <div className={`
-                p-1.5 rounded-full transition-all duration-300
+                p-2 rounded-full transition-all duration-300
                 ${isActive ? "bg-[#fbbf24]/10 shadow-[0_0_10px_rgba(255,215,0,0.2)]" : "bg-transparent"}
               `}>
-                <Icon size={20} className={isActive ? "drop-shadow-[0_0_8px_rgba(255,215,0,0.5)]" : ""} />
+                <Icon size={24} className={isActive ? "drop-shadow-[0_0_8px_rgba(255,215,0,0.5)]" : ""} />
               </div>
-              <span className={`text-[10px] font-medium leading-none ${isActive ? "text-white" : ""}`}>{item.label}</span>
+              <span className={`text-[11px] font-medium leading-none ${isActive ? "text-white" : ""}`}>{item.label}</span>
             </button>
           );
         })}

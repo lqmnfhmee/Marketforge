@@ -91,12 +91,12 @@ function TransactionForm() {
 
         <div className="form-panel">
 
-            <h2 className="text-2xl font-bold font-cinzel text-transparent bg-clip-text bg-gradient-to-r from-slate-200 to-slate-400">
+            <h2 className="text-xl sm:text-2xl font-bold font-cinzel text-transparent bg-clip-text bg-gradient-to-r from-slate-200 to-slate-400">
                 Quick Transaction
             </h2>
 
             {/* Type Toggle */}
-            <div className="flex gap-3 mt-6">
+            <div className="flex gap-2 sm:gap-3 mt-4 md:mt-6">
 
                 <button
                     onClick={() =>
@@ -141,7 +141,7 @@ function TransactionForm() {
             </div>
 
             {/* Form */}
-            <div className="space-y-4 mt-6">
+            <div className="space-y-3 sm:space-y-4 mt-4 md:mt-6">
 
                 {/* Custom Category Dropdown */}
                 <div className="relative" ref={dropdownRef}>
@@ -233,7 +233,7 @@ function TransactionForm() {
                             e.target.value
                         )
                     }
-                    className="input-fantasy resize-none h-28"
+                    className="input-fantasy resize-none h-20 sm:h-28"
                 />
 
             </div>
@@ -241,7 +241,7 @@ function TransactionForm() {
             <button
                 onClick={handleSubmit}
                 disabled={loading}
-                className="w-full btn-primary mt-6"
+                className="w-full btn-primary mt-4 md:mt-6"
             >
                 {loading ? "Saving..." : "Add Transaction"}
             </button>

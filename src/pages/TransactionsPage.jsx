@@ -23,7 +23,7 @@ function TransactionsPage() {
                     <div className="max-w-7xl mx-auto">
 
                         {/* Page Header */}
-                        <h1 className="text-3xl sm:text-4xl font-bold font-cinzel text-transparent bg-clip-text bg-gradient-to-r from-[#fbbf24] to-[#f59e0b]">
+                        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold font-cinzel text-transparent bg-clip-text bg-gradient-to-r from-[#fbbf24] to-[#f59e0b]">
                             Transactions
                         </h1>
 
@@ -44,7 +44,7 @@ function TransactionsPage() {
 
                         {/* Main Grid */}
                         {loading ? (
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mt-6 md:mt-8">
                                 {/* Form skeleton */}
                                 <div className="col-span-1">
                                     <Skeleton height={380} borderRadius={24} />
@@ -59,7 +59,7 @@ function TransactionsPage() {
                                 </div>
                             </div>
                         ) : (
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mt-6 md:mt-8">
 
                                 {/* Transaction Form */}
                                 <div className="col-span-1">

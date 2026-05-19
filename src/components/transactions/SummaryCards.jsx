@@ -44,7 +44,7 @@ function SummaryCards() {
     ];
 
     return (
-        <div className="grid grid-cols-4 gap-6 mt-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6 mt-6 md:mt-8">
 
             {summary.map((card, index) => {
                 const Icon = card.icon;
@@ -52,23 +52,22 @@ function SummaryCards() {
                 return (
                     <div
                         key={index}
-                        className="form-panel flex flex-col justify-between"
+                        className="form-panel flex flex-col justify-between !p-4 sm:!p-5 md:!p-6"
                     >
-                        <div className="flex justify-between items-center">
+                        <div className="flex justify-between items-start sm:items-center">
 
                             <div>
-                                <p className="text-sm font-semibold tracking-wide text-slate-400 uppercase">
+                                <p className="text-[10px] sm:text-xs md:text-sm font-semibold tracking-wide text-slate-400 uppercase">
                                     {card.title}
                                 </p>
 
-                                <h1 className="font-cinzel text-2xl sm:text-3xl font-bold text-white mt-1">
+                                <h1 className="font-cinzel text-lg sm:text-xl md:text-3xl font-bold text-white mt-1">
                                     {card.value}
                                 </h1>
                             </div>
 
                             <Icon
-                                className={card.color}
-                                size={28}
+                                className={`${card.color} w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 mt-1 sm:mt-0`}
                             />
 
                         </div>

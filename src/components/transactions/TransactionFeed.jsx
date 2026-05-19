@@ -17,24 +17,24 @@ function TransactionFeed() {
     const latestTransactions = [...filteredTransactions].reverse().slice(0, 15);
 
     return (
-        <div className="form-panel flex flex-col h-[600px] relative">
+        <div className="form-panel flex flex-col h-[450px] sm:h-[600px] relative">
             
             {/* Static Header */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shrink-0 mb-6 z-10">
-                <h2 className="font-cinzel text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-slate-200 to-slate-400">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 shrink-0 mb-4 sm:mb-6 z-10">
+                <h2 className="font-cinzel text-xl sm:text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-slate-200 to-slate-400">
                     Transaction History
                 </h2>
 
                 <input
                     placeholder="Search..."
-                    className="input-fantasy py-2 px-4 w-full sm:w-64"
+                    className="input-fantasy w-full sm:w-64"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />
             </div>
 
             {/* Scrollable Transaction List */}
-            <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 pb-8 space-y-4 relative z-0">
+            <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 pb-8 space-y-3 sm:space-y-4 relative z-0">
                 {latestTransactions.map((transaction, index) => (
                     <TransactionItem
                         key={index}
