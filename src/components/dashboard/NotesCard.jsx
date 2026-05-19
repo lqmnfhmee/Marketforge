@@ -2,7 +2,7 @@ import { BookOpen } from "lucide-react";
 
 function NotesCard() {
   return (
-    <div className="form-panel flex flex-col min-h-[300px] h-full group">
+    <div className="form-panel flex flex-col group shrink-0">
       {/* Background handled by .form-panel */}
       
       {/* Header */}
@@ -21,8 +21,8 @@ function NotesCard() {
         <textarea
           placeholder="Write your economy plans..."
           className="
-            w-full flex-1 min-h-[160px] bg-[#0b0f19]/80 backdrop-blur-sm rounded-2xl p-5
-            resize-none outline-none border border-[#1a1f2e] focus:border-slate-500
+            w-full flex-1 min-h-[120px] bg-[#0b0f19]/80 backdrop-blur-sm rounded-2xl p-5
+            resize-y outline-none border border-[#1a1f2e] focus:border-slate-500
             text-slate-300 placeholder-slate-600 transition-colors custom-scrollbar font-[Inter]
           "
         />
