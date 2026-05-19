@@ -1,7 +1,18 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import toast from "react-hot-toast";
 
 import { useWallet } from "../context/WalletContext";
+
+const CATEGORIES = [
+    "Guild Trade",
+    "Market Trade",
+    "Player Trade",
+    "Farming Expenses",
+    "Crafting Expenses",
+    "Ingredients Expenses",
+    "In Game Rewards",
+    "Fame Booster"
+];
 
 function TransactionForm() {
 
@@ -13,7 +24,7 @@ function TransactionForm() {
 
     const [category, setCategory] =
         useState(
-            "Ingredient Purchase"
+            "Market Trade"
         );
 
     const [amount, setAmount] =
@@ -24,6 +35,19 @@ function TransactionForm() {
 
     const [loading, setLoading] =
         useState(false);
+
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const dropdownRef = useRef(null);
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setIsDropdownOpen(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
 
     const handleSubmit =
         async () => {
@@ -119,49 +143,50 @@ function TransactionForm() {
             {/* Form */}
             <div className="space-y-4 mt-6">
 
-                <select
-                    value={category}
-                    onChange={(e) =>
-                        setCategory(
-                            e.target.value
-                        )
-                    }
-                    className="input-fantasy"
-                >
+                {/* Custom Category Dropdown */}
+                <div className="relative" ref={dropdownRef}>
+                    <button
+                        type="button"
+                        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                        className="input-fantasy w-full text-left flex justify-between items-center"
+                    >
+                        <span>{category}</span>
+                        <svg className={`w-5 h-5 text-slate-400 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
 
-                    <option>
-                        Market Sale
-                    </option>
-
-                    <option>
-                        Ingredient Purchase
-                    </option>
-
-                    <option>
-                        Animal Purchase
-                    </option>
-
-                    <option>
-                        Seed Purchase
-                    </option>
-
-                    <option>
-                        Craft Fee
-                    </option>
-
-                    <option>
-                        Butcher Fee
-                    </option>
-
-                    <option>
-                        Transport Cost
-                    </option>
-
-                    <option>
-                        Player Trade
-                    </option>
-
-                </select>
+                    {isDropdownOpen && (
+                        <div className="absolute z-10 w-full mt-2 bg-[#0b101c] border border-[#fbbf24]/20 rounded-xl shadow-[0_8px_30px_rgba(0,0,0,0.8)] overflow-hidden max-h-60 overflow-y-auto custom-scrollbar">
+                            {CATEGORIES.map((cat) => (
+                                <button
+                                    key={cat}
+                                    type="button"
+                                    onClick={() => {
+                                        setCategory(cat);
+                                        setIsDropdownOpen(false);
+                                    }}
+                                    className={`
+                                        w-full text-left px-4 py-3 
+                                        transition-all duration-200
+                                        flex items-center gap-3
+                                        border-b border-white/5 last:border-0
+                                        ${category === cat 
+                                            ? "bg-[#fbbf24]/10 text-[#fbbf24]" 
+                                            : "text-slate-300 hover:bg-[#fbbf24]/5 hover:text-[#fbbf24]"
+                                        }
+                                    `}
+                                >
+                                    {/* Icon Placeholder */}
+                                    <div className={`w-5 h-5 rounded-md flex-shrink-0 flex items-center justify-center transition-colors ${category === cat ? "bg-[#fbbf24]/20" : "bg-slate-800/50"}`}>
+                                        {/* Future Icon */}
+                                    </div>
+                                    <span className="font-medium font-[Inter]">{cat}</span>
+                                </button>
+                            ))}
+                        </div>
+                    )}
+                </div>
 
                 <input
                     type="text"
