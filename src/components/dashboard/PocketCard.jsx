@@ -12,15 +12,17 @@ function PocketCard() {
   );
 
   return (
-    <button
+    <div
       onClick={() => navigate("/pockets")}
-      className="form-panel text-left flex flex-col justify-between h-full min-h-[300px] group"
+      role="button"
+      tabIndex={0}
+      className="form-panel text-left flex flex-col group cursor-pointer shrink-0"
     >
       {/* Background Glows */}
       <div className="absolute top-0 right-0 w-64 h-64 bg-slate-400/5 blur-[80px] rounded-full pointer-events-none group-hover:bg-slate-400/10 transition-colors duration-700" />
       
       {/* Header */}
-      <div className="relative z-10 flex items-center justify-between mb-8">
+      <div className="relative z-10 flex items-center justify-between mb-2">
         <div>
           <h2 className="text-xl font-bold text-white tracking-wide" style={{ fontFamily: "'Cinzel', serif" }}>
             Savings Pockets
@@ -33,7 +35,7 @@ function PocketCard() {
       </div>
 
       {/* Balance */}
-      <div className="relative z-10 mb-8">
+      <div className="relative z-10 mb-6">
         <h1 
           className="text-4xl sm:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-b from-white via-slate-200 to-slate-400 tracking-tight"
           style={{ fontFamily: "'Cinzel', serif" }}
@@ -43,7 +45,7 @@ function PocketCard() {
       </div>
 
       {/* Avatars / Pockets */}
-      <div className="relative z-10 mt-auto pt-6 border-t border-[#1a1f2e]">
+      <div className="relative z-10 mt-2 pt-6 border-t border-[#1a1f2e]">
         <div className="flex flex-wrap gap-2 sm:gap-3">
           {pockets.length === 0 && (
             <p className="text-gray-500 text-sm italic group-hover:text-gray-400 transition-colors">
@@ -76,7 +78,7 @@ function PocketCard() {
           ))}
         </div>
       </div>
-    </button>
+    </div>
   );
 }
 
