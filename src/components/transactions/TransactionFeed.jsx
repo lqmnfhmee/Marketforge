@@ -13,8 +13,9 @@ function TransactionFeed() {
         return matchesCategory || matchesNote;
     });
 
-    // Limit to latest 15 transactions
-    const latestTransactions = [...filteredTransactions].reverse().slice(0, 15);
+    // Newest first (WalletContext fetches descending), limit to 15
+    const latestTransactions = filteredTransactions.slice(0, 15);
+
 
     return (
         <div className="form-panel flex flex-col h-[450px] sm:h-[600px] relative">
