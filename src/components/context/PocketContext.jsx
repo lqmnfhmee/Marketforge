@@ -197,33 +197,56 @@ export function PocketProvider({
             }
 
             /* -----------------------------
-               Add Initial Deposit Activity
+               Initial Deposit — deduct from main balance
             ----------------------------- */
 
-            if (
-                pocket.balance &&
-                pocket.balance > 0
-            ) {
+            if (pocket.balance && pocket.balance > 0) {
 
+                /* Validate: can't seed pocket with more than main balance */
+                if (Number(pocket.balance) > silverBalance) {
+                    /* Roll back the pocket we just created */
+                    await supabase
+                        .from("pockets")
+                        .delete()
+                        .eq("id", data.id);
+
+                    return {
+                        success: false,
+                        error: `Insufficient main balance. Available: ${silverBalance.toLocaleString()} silver`,
+                    };
+                }
+
+                /* 1. Deduct from main wallet */
+                const { error: txError } = await supabase
+                    .from("transactions")
+                    .insert([{
+                        user_id:  currentUser.id,
+                        type:     "expense",
+                        category: "Pocket Transfer",
+                        amount:   Number(pocket.balance),
+                        note:     `Initial deposit into pocket: ${pocket.name}`,
+                    }]);
+
+                if (txError) {
+                    console.error("createPocket initial tx error:", txError);
+                    return {
+                        success: false,
+                        error: txError.message,
+                    };
+                }
+
+                /* 2. Log pocket activity */
                 await supabase
-                    .from(
-                        "pocket_activities"
-                    )
-                    .insert([
-                        {
-                            user_id:
-                                user.id,
+                    .from("pocket_activities")
+                    .insert([{
+                        user_id:   currentUser.id,
+                        pocket_id: data.id,
+                        type:      "deposit",
+                        amount:    pocket.balance,
+                    }]);
 
-                            pocket_id:
-                                data.id,
-
-                            type:
-                                "deposit",
-
-                            amount:
-                                pocket.balance,
-                        },
-                    ]);
+                /* Refresh main wallet to reflect deduction */
+                await fetchTransactions();
             }
 
             await fetchPockets();
