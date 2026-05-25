@@ -12,36 +12,56 @@ import { TrendingUp, TrendingDown, Edit2, X, Check, CircleDollarSign, Minus } fr
 import { useState } from "react";
 
 /* ------------------------------------------------------------------
-   Daily Profit badge — shown under total silver balance
+   Daily Profit badge — small, subdued text under total silver balance
 ------------------------------------------------------------------ */
 function DailyProfitBadge() {
   const { getDailyChange } = useWallet();
   const dailyChange = getDailyChange();
-  const isPositive = dailyChange > 0;
+  const isPositive  = dailyChange > 0;
+  const isNegative  = dailyChange < 0;
   const isBreakEven = dailyChange === 0;
 
+  /* Colour */
   const colorClass = isBreakEven
-    ? "text-slate-400"
+    ? "text-slate-500"
     : isPositive
-    ? "text-[#10b981] drop-shadow-[0_0_8px_rgba(16,185,129,0.3)]"
-    : "text-[#f43f5e] drop-shadow-[0_0_8px_rgba(244,63,94,0.3)]";
+    ? "text-emerald-400"
+    : "text-rose-400";
+
+  /* Label */
+  const label = isBreakEven
+    ? "No activity today"
+    : isPositive
+    ? "Daily Profit"
+    : "Daily Loss";
+
+  /* Prefix sign */
+  const prefix = isPositive ? "+" : "";
 
   return (
-    <div
-      className={`inline-flex items-center gap-2 text-base font-bold transition-colors duration-300 ${colorClass}`}
-      style={{ fontFamily: "'Inter', sans-serif" }}
-    >
-      {isBreakEven ? (
-        <Minus size={20} />
-      ) : isPositive ? (
-        <TrendingUp size={20} />
-      ) : (
-        <TrendingDown size={20} />
-      )}
-      <span>
-        {isPositive ? "+" : ""}
-        {dailyChange.toLocaleString()} today
-      </span>
+    <div className="flex flex-col items-center gap-1 mt-1">
+      <div
+        className={`inline-flex items-center gap-1.5 text-sm font-medium transition-colors duration-300 ${colorClass}`}
+        style={{ fontFamily: "'Inter', sans-serif" }}
+      >
+        {/* Small directional indicator */}
+        {isBreakEven ? (
+          <Minus size={13} strokeWidth={2.5} />
+        ) : isPositive ? (
+          <TrendingUp size={13} strokeWidth={2.5} />
+        ) : (
+          <TrendingDown size={13} strokeWidth={2.5} />
+        )}
+
+        <span>
+          {prefix}{dailyChange.toLocaleString()}
+        </span>
+
+        {/* Quiet label */}
+        <span className="text-xs font-normal opacity-70">
+          {label}
+        </span>
+      </div>
     </div>
   );
 }
