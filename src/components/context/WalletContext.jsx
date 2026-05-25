@@ -239,6 +239,27 @@ export function WalletProvider({
   }
 
   /* -----------------------------
+     Daily Profit Change
+  ----------------------------- */
+
+  function getDailyChange() {
+    const todayStr = new Date().toDateString();
+
+    return transactions
+      .filter((t) => {
+        const txDate = new Date(
+          t.created_at || t.timestamp
+        ).toDateString();
+        return txDate === todayStr && t.category !== "Balance Adjustment";
+      })
+      .reduce((sum, t) => {
+        return t.type === "income"
+          ? sum + Number(t.amount)
+          : sum - Number(t.amount);
+      }, 0);
+  }
+
+  /* -----------------------------
      Update Gold Balance
   ----------------------------- */
 
@@ -427,6 +448,8 @@ export function WalletProvider({
         getSilverBalance,
 
         getWeeklyChange,
+
+        getDailyChange,
 
         goldBalance,
 

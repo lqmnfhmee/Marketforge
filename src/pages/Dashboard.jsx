@@ -8,16 +8,49 @@ import Skeleton, { SkeletonTheme } from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import { useWallet } from "../components/context/WalletContext";
 import { usePockets } from "../components/context/PocketContext";
-import { TrendingUp, TrendingDown, Edit2, X, Check, CircleDollarSign } from "lucide-react";
+import { TrendingUp, TrendingDown, Edit2, X, Check, CircleDollarSign, Minus } from "lucide-react";
 import { useState } from "react";
+
+/* ------------------------------------------------------------------
+   Daily Profit badge — shown under total silver balance
+------------------------------------------------------------------ */
+function DailyProfitBadge() {
+  const { getDailyChange } = useWallet();
+  const dailyChange = getDailyChange();
+  const isPositive = dailyChange > 0;
+  const isBreakEven = dailyChange === 0;
+
+  const colorClass = isBreakEven
+    ? "text-slate-400"
+    : isPositive
+    ? "text-[#10b981] drop-shadow-[0_0_8px_rgba(16,185,129,0.3)]"
+    : "text-[#f43f5e] drop-shadow-[0_0_8px_rgba(244,63,94,0.3)]";
+
+  return (
+    <div
+      className={`inline-flex items-center gap-2 text-base font-bold transition-colors duration-300 ${colorClass}`}
+      style={{ fontFamily: "'Inter', sans-serif" }}
+    >
+      {isBreakEven ? (
+        <Minus size={20} />
+      ) : isPositive ? (
+        <TrendingUp size={20} />
+      ) : (
+        <TrendingDown size={20} />
+      )}
+      <span>
+        {isPositive ? "+" : ""}
+        {dailyChange.toLocaleString()} today
+      </span>
+    </div>
+  );
+}
 
 /* ------------------------------------------------------------------
    Inline hero — Total Net Worth centered, Gold badge top-right
 ------------------------------------------------------------------ */
 function HeroHeader() {
-  const { silverBalance, getWeeklyChange, addTransaction } = useWallet();
-  const weeklyChange = getWeeklyChange();
-  const isPositive = weeklyChange >= 0;
+  const { silverBalance, addTransaction } = useWallet();
 
   const [isEditing, setIsEditing] = useState(false);
   const [editAmount, setEditAmount] = useState("");
@@ -44,7 +77,7 @@ function HeroHeader() {
 
       <div className="relative z-10 flex flex-col items-center text-center group w-full">
         <p className="text-slate-400 text-sm font-bold tracking-[0.25em] uppercase mb-4 font-[Inter]">
-          Total Net Worth
+          Total Silver Balance
         </p>
 
         {/* Balance — editable */}
@@ -115,22 +148,8 @@ function HeroHeader() {
               </button>
             </div>
           )}
-
-          {/* Weekly profit */}
-          <div
-            className={`inline-flex items-center gap-2 text-base font-bold transition-colors duration-300 ${
-              isPositive 
-                ? "text-[#10b981] drop-shadow-[0_0_8px_rgba(16,185,129,0.3)]" 
-                : "text-[#9f1239] drop-shadow-[0_0_8px_rgba(159,18,57,0.3)]"
-            }`}
-            style={{ fontFamily: "'Inter', sans-serif" }}
-          >
-            {isPositive ? <TrendingUp size={20} /> : <TrendingDown size={20} />}
-            <span>
-              {isPositive ? "+" : ""}
-              {weeklyChange.toLocaleString()} this week
-            </span>
-          </div>
+          {/* Daily profit badge */}
+          <DailyProfitBadge />
         </div>
     </div>
   );
