@@ -435,9 +435,48 @@ export function PocketProvider({
     const closePocket = async (pocketId) => {
         if (!user) return { success: false, error: "Not authenticated" };
 
+        /* Find the pocket to get its remaining balance */
+        const pocket = pockets.find((p) => p.id === pocketId);
+        if (!pocket) return { success: false, error: "Pocket not found" };
+
+        /* -------------------------------------------------------
+           Auto-return remaining balance to main wallet
+           If the pocket still has silver, create an income
+           transaction so the main balance is made whole.
+        ------------------------------------------------------- */
+        if (Number(pocket.balance) > 0) {
+
+            /* 1. Return silver to main wallet */
+            const { error: txError } = await supabase
+                .from("transactions")
+                .insert([{
+                    user_id:  user.id,
+                    type:     "income",
+                    category: "Pocket Transfer",
+                    amount:   Number(pocket.balance),
+                    note:     `Pocket closed — returned ${Number(pocket.balance).toLocaleString()} silver from: ${pocket.name}`,
+                }]);
+
+            if (txError) {
+                console.error("closePocket return tx error:", txError);
+                return { success: false, error: txError.message };
+            }
+
+            /* 2. Log final withdraw activity on the pocket */
+            await supabase
+                .from("pocket_activities")
+                .insert([{
+                    user_id:   user.id,
+                    pocket_id: pocketId,
+                    type:      "withdraw",
+                    amount:    pocket.balance,
+                }]);
+        }
+
+        /* Archive the pocket */
         const { error } = await supabase
             .from("pockets")
-            .update({ is_archived: true })
+            .update({ is_archived: true, balance: 0 })
             .eq("id", pocketId)
             .eq("user_id", user.id);
 
@@ -446,8 +485,11 @@ export function PocketProvider({
             return { success: false, error: error.message };
         }
 
+        /* Refresh both contexts */
+        await fetchTransactions();
         await fetchPockets();
         return { success: true };
+
     };
 
     return (

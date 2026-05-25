@@ -105,10 +105,15 @@ function PocketDetailsPage() {
     const handleClosePocket = async () => {
         setSubmitting(true);
         const loadingToast = toast.loading("Closing pocket...");
+        const remainingBalance = pocket.balance;
         const { success, error } = await closePocket(pocket.id);
         toast.dismiss(loadingToast);
         if (success) {
-            toast.success("Pocket closed");
+            if (remainingBalance > 0) {
+                toast.success(`Pocket closed — ${remainingBalance.toLocaleString()} silver returned to main balance`);
+            } else {
+                toast.success("Pocket closed");
+            }
             navigate("/pockets");
         } else {
             toast.error(error || "Failed to close pocket");
