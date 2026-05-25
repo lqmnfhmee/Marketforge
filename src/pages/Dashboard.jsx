@@ -2,8 +2,11 @@ import Sidebar from "../config/Sidebar";
 import GoldCard from "../components/dashboard/GoldCart";
 import WeeklyProfitChart from "../components/dashboard/WeeklyProfitChart";
 import NotesCard from "../components/dashboard/NotesCard";
-import TransactionsCard from "../components/dashboard/TransactionCard";
 import PocketCard from "../components/dashboard/PocketCard";
+import RecentActivityFeed from "../components/dashboard/RecentActivityFeed";
+import WeeklyEconomySummary from "../components/dashboard/WeeklyEconomySummary";
+import LargestTransaction from "../components/dashboard/LargestTransaction";
+import QuickActions from "../components/dashboard/QuickActions";
 import Skeleton, { SkeletonTheme } from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import { useWallet } from "../components/context/WalletContext";
@@ -18,7 +21,6 @@ function DailyProfitBadge() {
   const { getDailyChange } = useWallet();
   const dailyChange = getDailyChange();
   const isPositive  = dailyChange > 0;
-  const isNegative  = dailyChange < 0;
   const isBreakEven = dailyChange === 0;
 
   /* Colour */
@@ -93,7 +95,7 @@ function HeroHeader() {
     setIsEditing(false);
     setEditAmount("");
   };  return (
-    <div className="relative w-full mx-auto pt-12 pb-14 px-4 flex flex-col items-center justify-center">
+    <div className="relative w-full mx-auto pt-12 pb-6 px-4 flex flex-col items-center justify-center">
 
       <div className="relative z-10 flex flex-col items-center text-center group w-full">
         <p className="text-slate-400 text-sm font-bold tracking-[0.25em] uppercase mb-4 font-[Inter]">
@@ -170,6 +172,11 @@ function HeroHeader() {
           )}
           {/* Daily profit badge */}
           <DailyProfitBadge />
+
+          {/* ── Quick Action Buttons ── */}
+          <div className="mt-5">
+            <QuickActions />
+          </div>
         </div>
     </div>
   );
@@ -196,6 +203,7 @@ function Dashboard() {
               <Skeleton height={20} width={140} borderRadius={8} />
               <Skeleton height={72} width="80%" borderRadius={16} />
               <Skeleton height={28} width={240} borderRadius={8} />
+              <Skeleton height={40} width={300} borderRadius={12} />
             </div>
           ) : (
             <div className="relative">
@@ -218,19 +226,22 @@ function Dashboard() {
                   <div className="flex flex-col gap-6">
                     <Skeleton height={300} borderRadius={24} />
                     <Skeleton height={220} borderRadius={24} />
+                    <Skeleton height={200} borderRadius={24} />
                   </div>
                 </>
               ) : (
                 <>
-                  {/* Left column — chart + transactions */}
+                  {/* Left column — chart + recent activity */}
                   <div className="flex flex-col gap-6">
                     <WeeklyProfitChart />
-                    <TransactionsCard />
+                    <RecentActivityFeed />
                   </div>
 
-                  {/* Right column — notes + pockets */}
+                  {/* Right column — notes + weekly summary + largest tx + pockets */}
                   <div className="flex flex-col gap-6">
                     <NotesCard />
+                    <WeeklyEconomySummary />
+                    <LargestTransaction />
                     <PocketCard />
                   </div>
                 </>
