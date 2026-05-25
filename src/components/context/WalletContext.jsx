@@ -217,7 +217,8 @@ export function WalletProvider({
             t.timestamp
           ).getTime() >=
           oneWeekAgo &&
-          t.category !== "Balance Adjustment"
+          t.category !== "Balance Adjustment" &&
+          t.category !== "Pocket Transfer"
       )
       .reduce(
         (sum, t) => {
@@ -250,7 +251,9 @@ export function WalletProvider({
         const txDate = new Date(
           t.created_at || t.timestamp
         ).toDateString();
-        return txDate === todayStr && t.category !== "Balance Adjustment";
+        return txDate === todayStr &&
+          t.category !== "Balance Adjustment" &&
+          t.category !== "Pocket Transfer";
       })
       .reduce((sum, t) => {
         return t.type === "income"
@@ -441,6 +444,8 @@ export function WalletProvider({
         loading,
 
         addTransaction,
+
+        fetchTransactions,
 
         silverBalance:
           getSilverBalance(),

@@ -11,6 +11,9 @@ import { supabase }
 import { useAuth }
     from "./AuthContext";
 
+import { useWallet }
+    from "./WalletContext";
+
 const PocketContext =
     createContext(null);
 
@@ -20,6 +23,10 @@ export function PocketProvider({
 
     const { user } =
         useAuth();
+
+    const { silverBalance, fetchTransactions } =
+        useWallet();
+
 
     const [pockets,
         setPockets] =
@@ -228,6 +235,7 @@ export function PocketProvider({
 
     /* -----------------------------
        Deposit Silver
+       — moves money OUT of main balance INTO pocket
     ----------------------------- */
 
     const depositToPocket =
@@ -237,7 +245,7 @@ export function PocketProvider({
         ) => {
 
             if (!user)
-                return;
+                return { success: false, error: "Not authenticated" };
 
             const pocket =
                 pockets.find(
@@ -247,56 +255,62 @@ export function PocketProvider({
                 );
 
             if (!pocket)
-                return;
+                return { success: false, error: "Pocket not found" };
 
-            const newBalance =
-                Number(
-                    pocket.balance
-                ) + Number(amount);
+            /* Validate: cannot deposit more than main balance */
+            if (Number(amount) > silverBalance) {
+                return {
+                    success: false,
+                    error: `Insufficient main balance. Available: ${silverBalance.toLocaleString()} silver`,
+                };
+            }
 
-            /* Update Pocket Balance */
+            const newPocketBalance =
+                Number(pocket.balance) + Number(amount);
 
+            /* 1. Deduct from main wallet via transactions table */
+            const { error: txError } = await supabase
+                .from("transactions")
+                .insert([{
+                    user_id:  user.id,
+                    type:     "expense",
+                    category: "Pocket Transfer",
+                    amount:   Number(amount),
+                    note:     `Transferred ${Number(amount).toLocaleString()} to pocket: ${pocket.name}`,
+                }]);
+
+            if (txError) {
+                console.error("depositToPocket tx error:", txError);
+                return { success: false, error: txError.message };
+            }
+
+            /* 2. Update pocket balance */
             await supabase
                 .from("pockets")
-                .update({
-                    balance:
-                        newBalance,
-                })
-                .eq(
-                    "id",
-                    pocketId
-                )
-                .eq(
-                    "user_id",
-                    user.id
-                );
+                .update({ balance: newPocketBalance })
+                .eq("id", pocketId)
+                .eq("user_id", user.id);
 
-            /* Add Activity */
-
+            /* 3. Log pocket activity */
             await supabase
-                .from(
-                    "pocket_activities"
-                )
-                .insert([
-                    {
-                        user_id:
-                            user.id,
+                .from("pocket_activities")
+                .insert([{
+                    user_id:   user.id,
+                    pocket_id: pocketId,
+                    type:      "deposit",
+                    amount,
+                }]);
 
-                        pocket_id:
-                            pocketId,
-
-                        type:
-                            "deposit",
-
-                        amount,
-                    },
-                ]);
-
+            /* Refresh both contexts */
+            await fetchTransactions();
             await fetchPockets();
+
+            return { success: true };
         };
 
     /* -----------------------------
        Withdraw Silver
+       — moves money OUT of pocket BACK TO main balance
     ----------------------------- */
 
     const withdrawFromPocket =
@@ -306,7 +320,7 @@ export function PocketProvider({
         ) => {
 
             if (!user)
-                return;
+                return { success: false, error: "Not authenticated" };
 
             const pocket =
                 pockets.find(
@@ -316,48 +330,57 @@ export function PocketProvider({
                 );
 
             if (!pocket)
-                return;
+                return { success: false, error: "Pocket not found" };
 
-            const newBalance =
-                Number(
-                    pocket.balance
-                ) - Number(amount);
+            /* Validate: cannot withdraw more than pocket balance */
+            if (Number(amount) > Number(pocket.balance)) {
+                return {
+                    success: false,
+                    error: `Insufficient pocket balance. Available: ${Number(pocket.balance).toLocaleString()} silver`,
+                };
+            }
 
+            const newPocketBalance =
+                Number(pocket.balance) - Number(amount);
+
+            /* 1. Add to main wallet via transactions table */
+            const { error: txError } = await supabase
+                .from("transactions")
+                .insert([{
+                    user_id:  user.id,
+                    type:     "income",
+                    category: "Pocket Transfer",
+                    amount:   Number(amount),
+                    note:     `Withdrew ${Number(amount).toLocaleString()} from pocket: ${pocket.name}`,
+                }]);
+
+            if (txError) {
+                console.error("withdrawFromPocket tx error:", txError);
+                return { success: false, error: txError.message };
+            }
+
+            /* 2. Update pocket balance */
             await supabase
                 .from("pockets")
-                .update({
-                    balance:
-                        newBalance,
-                })
-                .eq(
-                    "id",
-                    pocketId
-                )
-                .eq(
-                    "user_id",
-                    user.id
-                );
+                .update({ balance: newPocketBalance })
+                .eq("id", pocketId)
+                .eq("user_id", user.id);
 
+            /* 3. Log pocket activity */
             await supabase
-                .from(
-                    "pocket_activities"
-                )
-                .insert([
-                    {
-                        user_id:
-                            user.id,
+                .from("pocket_activities")
+                .insert([{
+                    user_id:   user.id,
+                    pocket_id: pocketId,
+                    type:      "withdraw",
+                    amount,
+                }]);
 
-                        pocket_id:
-                            pocketId,
-
-                        type:
-                            "withdraw",
-
-                        amount,
-                    },
-                ]);
-
+            /* Refresh both contexts */
+            await fetchTransactions();
             await fetchPockets();
+
+            return { success: true };
         };
 
     /* -----------------------------

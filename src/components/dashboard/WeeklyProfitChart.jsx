@@ -85,6 +85,8 @@ function WeeklyProfitChart() {
         if (!isFuture) {
             transactions.forEach((t) => {
                 if (t.category === "Balance Adjustment") return;
+                if (t.category === "Pocket Transfer") return;
+
                 const ts = new Date(t.created_at || t.timestamp).getTime();
                 if (ts < start.getTime() || ts >= end.getTime()) return;
                 if (t.type === "income")       weeklyIncome  += Number(t.amount);

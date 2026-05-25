@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Plus, ArrowDown, Settings, X } from "lucide-react";
 import Sidebar from "../config/Sidebar";
 import { usePockets } from "../components/context/PocketContext";
+import { useWallet } from "../components/context/WalletContext";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import Skeleton, { SkeletonTheme } from "react-loading-skeleton";
@@ -13,6 +14,7 @@ function PocketDetailsPage() {
     const { id } = useParams();
     const navigate = useNavigate();
     const { pockets, loading, depositToPocket, withdrawFromPocket, updatePocket, closePocket, fetchPockets } = usePockets();
+    const { silverBalance } = useWallet();
     const pocket = pockets.find((p) => p.id === Number(id));
 
     const [amount, setAmount] = useState("");
@@ -117,29 +119,35 @@ function PocketDetailsPage() {
     const handleSubmit = async () => {
         const value = Number(amount);
         if (!value || value <= 0) {
-            toast.error("Invalid amount");
+            toast.error("Enter a valid amount");
             return;
         }
 
         setSubmitting(true);
-        const loadingToast = toast.loading("Processing...");
+        const loadingToast = toast.loading("Processing transfer...");
 
         if (mode === "deposit") {
-            await depositToPocket(pocket.id, value);
+            const result = await depositToPocket(pocket.id, value);
             toast.dismiss(loadingToast);
-            toast.success("Silver added to pocket");
-        }
-
-        if (mode === "withdraw") {
-            if (value > pocket.balance) {
-                toast.dismiss(loadingToast);
-                toast.error("Not enough silver");
+            if (result?.success) {
+                toast.success(`${value.toLocaleString()} silver moved to pocket`);
+            } else {
+                toast.error(result?.error || "Transfer failed");
                 setSubmitting(false);
                 return;
             }
-            await withdrawFromPocket(pocket.id, value);
+        }
+
+        if (mode === "withdraw") {
+            const result = await withdrawFromPocket(pocket.id, value);
             toast.dismiss(loadingToast);
-            toast.success("Silver withdrawn successfully");
+            if (result?.success) {
+                toast.success(`${value.toLocaleString()} silver returned to main balance`);
+            } else {
+                toast.error(result?.error || "Withdrawal failed");
+                setSubmitting(false);
+                return;
+            }
         }
 
         setAmount("");
@@ -199,9 +207,29 @@ function PocketDetailsPage() {
                     {(mode === "deposit" || mode === "withdraw") && (
                         <div className="form-panel mt-8">
                             <div className="relative z-10 max-w-xl mx-auto">
-                                <h2 className="text-2xl sm:text-3xl text-white font-bold text-center tracking-wide mb-6" style={{ fontFamily: "'Cinzel', serif" }}>
+                                <h2 className="text-2xl sm:text-3xl text-white font-bold text-center tracking-wide mb-2" style={{ fontFamily: "'Cinzel', serif" }}>
                                     {mode === "deposit" ? "Deposit Silver" : "Withdraw Silver"}
                                 </h2>
+
+                                {/* Available balance hint */}
+                                <p className="text-center text-xs text-slate-500 mb-6 font-[Inter]">
+                                    {mode === "deposit" ? (
+                                        <>
+                                            Available in main wallet:{" "}
+                                            <span className="text-emerald-400 font-bold">
+                                                {silverBalance.toLocaleString()} silver
+                                            </span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            Available in pocket:{" "}
+                                            <span className="text-emerald-400 font-bold">
+                                                {pocket.balance.toLocaleString()} silver
+                                            </span>
+                                        </>
+                                    )}
+                                </p>
+
                                 <input
                                     type="text"
                                     placeholder="Enter Amount"
@@ -215,12 +243,25 @@ function PocketDetailsPage() {
                                     className="input-fantasy text-center text-xl font-bold"
                                     style={{ fontFamily: "'Cinzel', serif" }}
                                 />
+
+                                {/* Soft warning if amount exceeds available */}
+                                {mode === "deposit" && Number(amount) > silverBalance && (
+                                    <p className="text-rose-400 text-xs text-center mt-2 font-[Inter]">
+                                        ⚠ Exceeds main balance ({silverBalance.toLocaleString()} silver)
+                                    </p>
+                                )}
+                                {mode === "withdraw" && Number(amount) > pocket.balance && (
+                                    <p className="text-rose-400 text-xs text-center mt-2 font-[Inter]">
+                                        ⚠ Exceeds pocket balance ({pocket.balance.toLocaleString()} silver)
+                                    </p>
+                                )}
+
                                 <button
                                     onClick={handleSubmit}
                                     disabled={submitting}
                                     className="btn-primary w-full mt-6"
                                 >
-                                    {submitting ? "Processing..." : "Confirm Transaction"}
+                                    {submitting ? "Processing..." : "Confirm Transfer"}
                                 </button>
                                 <button
                                     onClick={() => setMode(null)}
