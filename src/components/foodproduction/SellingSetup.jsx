@@ -1,5 +1,3 @@
-import { MailCheck } from "lucide-react";
-
 function SellingSetup(props) {
     return (
         <div className="form-panel flex flex-col">
@@ -11,10 +9,10 @@ function SellingSetup(props) {
                         className="text-xl font-bold text-white tracking-wide"
                         style={{ fontFamily: "'Cinzel', serif" }}
                     >
-                        Final Sale Result
+                        Production Details
                     </h2>
                     <p className="text-slate-500 text-xs mt-1">
-                        Enter values from your Albion market mail after items are sold.
+                        Name your production run and record how many items you crafted.
                     </p>
                 </div>
 
@@ -55,48 +53,30 @@ function SellingSetup(props) {
                     />
                 </div>
 
-                {/* Actual Silver Received */}
-                <div>
-                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">
-                        Actual Silver Received
-                    </label>
-                    <input
-                        type="text"
-                        value={
-                            props.actualSilverReceived === "" || props.actualSilverReceived === undefined
-                                ? ""
-                                : Number(props.actualSilverReceived).toLocaleString()
-                        }
-                        onChange={(e) => {
-                            const raw = e.target.value.replace(/,/g, "");
-                            if (/^\d*$/.test(raw)) {
-                                props.setActualSilverReceived(raw ? Number(raw) : "");
-                            }
-                        }}
-                        className="input-fantasy font-bold"
-                        style={{ fontFamily: "'Cinzel', serif" }}
-                        placeholder="0"
-                    />
-                    <p className="text-[10px] text-slate-600 mt-2 flex items-center gap-1.5">
-                        <MailCheck size={11} className="text-slate-500 shrink-0" />
-                        Copy the exact silver amount from your Albion market mail.
+                {/* Workflow tip */}
+                <div className="px-4 py-3 rounded-xl bg-[#0b0f19]/80 border border-[#1a1f2e]">
+                    <p className="text-[10px] text-slate-600 uppercase tracking-widest font-bold mb-2">
+                        Workflow
                     </p>
+                    <ol className="space-y-1.5 text-xs text-slate-500">
+                        <li className="flex items-start gap-2">
+                            <span className="text-amber-500 font-bold shrink-0">1.</span>
+                            Fill farming &amp; crafting costs above.
+                        </li>
+                        <li className="flex items-start gap-2">
+                            <span className="text-amber-500 font-bold shrink-0">2.</span>
+                            Save the production session.
+                        </li>
+                        <li className="flex items-start gap-2">
+                            <span className="text-amber-500 font-bold shrink-0">3.</span>
+                            Sell items in Albion and wait for market mail.
+                        </li>
+                        <li className="flex items-start gap-2">
+                            <span className="text-amber-500 font-bold shrink-0">4.</span>
+                            Return here, open the saved session, and enter actual silver received.
+                        </li>
+                    </ol>
                 </div>
-
-                {/* Live summary row — only shown when value is entered */}
-                {Number(props.actualSilverReceived) > 0 && (
-                    <div className="flex items-center justify-between bg-[#0b0f19]/80 border border-[#1a1f2e] px-4 py-3 rounded-xl">
-                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
-                            Silver Received
-                        </span>
-                        <span
-                            className="text-[#34d399] font-bold text-lg"
-                            style={{ fontFamily: "'Cinzel', serif" }}
-                        >
-                            {Number(props.actualSilverReceived).toLocaleString()}
-                        </span>
-                    </div>
-                )}
 
             </div>
         </div>

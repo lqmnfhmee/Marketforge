@@ -1,94 +1,64 @@
-function ProfitSummary(props) {
-    const profitable = props.profit >= 0;
-    const hasRevenue = Number(props.actualSilverReceived) > 0;
-
+function ProfitSummary({ farmingCost, craftingCost, totalExpenses }) {
     return (
-        <div className="form-panel flex flex-col justify-center text-center relative overflow-hidden">
-            {/* Background glow */}
-            <div
-                className={`absolute inset-0 opacity-10 pointer-events-none ${
-                    profitable ? "bg-[#10b981]" : "bg-[#f43f5e]"
-                }`}
-            />
+        <div className="form-panel flex flex-col relative overflow-hidden">
+            <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-[rgba(251,191,36,0.25)] to-transparent" />
 
             <div className="relative z-10">
                 <p
-                    className="text-slate-400 font-bold text-xs uppercase tracking-widest mb-2"
+                    className="text-slate-400 font-bold text-xs uppercase tracking-widest mb-1"
                     style={{ fontFamily: "'Inter', sans-serif" }}
                 >
-                    {hasRevenue ? "Final Profit" : "Estimated Profit"}
+                    Cost Summary
+                </p>
+                <p className="text-slate-600 text-[10px] mb-6">
+                    This session's total operational expenses.
                 </p>
 
-                {/* Profit figure */}
-                <h1
-                    className={`text-4xl sm:text-5xl font-bold tracking-wide ${
-                        profitable
-                            ? "text-[#34d399] drop-shadow-[0_0_15px_rgba(16,185,129,0.3)]"
-                            : "text-[#f43f5e] drop-shadow-[0_0_15px_rgba(244,63,94,0.3)]"
-                    }`}
-                    style={{ fontFamily: "'Cinzel', serif" }}
-                >
-                    {profitable ? "+" : ""}
-                    {props.profit.toLocaleString()}
-                </h1>
-
-                {/* ROI */}
-                <p
-                    className="text-white mt-4 text-sm font-bold tracking-wider"
-                    style={{ fontFamily: "'Inter', sans-serif" }}
-                >
-                    ROI:
-                    <span
-                        className={`ml-2 text-lg ${profitable ? "text-[#34d399]" : "text-[#f43f5e]"}`}
+                {/* Total expenses hero */}
+                <div className="text-center mb-6">
+                    <p className="text-[10px] uppercase tracking-widest text-slate-600 mb-1">
+                        Total Expenses
+                    </p>
+                    <h1
+                        className="text-4xl sm:text-5xl font-bold tracking-wide text-white"
                         style={{ fontFamily: "'Cinzel', serif" }}
                     >
-                        {props.roi}%
-                    </span>
-                </p>
+                        {totalExpenses.toLocaleString()}
+                    </h1>
+                    <p className="text-[10px] text-slate-600 mt-1">silver</p>
+                </div>
 
                 {/* Breakdown */}
-                <div className="mt-8 space-y-3 bg-[#0b0f19]/80 border border-[#1a1f2e] p-4 rounded-xl">
+                <div className="space-y-3 bg-[#0b0f19]/80 border border-[#1a1f2e] p-4 rounded-xl">
                     <div className="flex justify-between items-center text-slate-300">
-                        <span className="text-xs uppercase tracking-widest font-bold">
-                            Total Expenses
-                        </span>
+                        <span className="text-xs uppercase tracking-widest font-bold">Farming</span>
                         <span className="font-bold" style={{ fontFamily: "'Cinzel', serif" }}>
-                            {props.totalExpenses.toLocaleString()}
+                            {farmingCost.toLocaleString()}
                         </span>
                     </div>
-
                     <div className="flex justify-between items-center text-slate-300">
-                        <span className="text-xs uppercase tracking-widest font-bold">
-                            {hasRevenue ? "Silver Received" : "Actual Silver"}
+                        <span className="text-xs uppercase tracking-widest font-bold">Crafting</span>
+                        <span className="font-bold" style={{ fontFamily: "'Cinzel', serif" }}>
+                            {craftingCost.toLocaleString()}
+                        </span>
+                    </div>
+                    <div className="border-t border-[#1a1f2e] pt-3 flex justify-between items-center">
+                        <span className="text-xs uppercase tracking-widest font-bold text-[#fbbf24]">
+                            Total
                         </span>
                         <span
-                            className={`font-bold ${hasRevenue ? "text-[#34d399]" : "text-slate-500"}`}
+                            className="font-bold text-[#fbbf24] text-lg"
                             style={{ fontFamily: "'Cinzel', serif" }}
                         >
-                            {hasRevenue ? Number(props.actualSilverReceived).toLocaleString() : "—"}
+                            {totalExpenses.toLocaleString()}
                         </span>
                     </div>
                 </div>
 
-                {/* Status badge */}
-                <div className="mt-6">
-                    {profitable ? (
-                        <div className="bg-[#10b981]/10 border border-[#10b981]/30 text-[#34d399] py-3 rounded-xl font-bold uppercase tracking-widest text-xs shadow-[0_0_20px_rgba(16,185,129,0.1)]">
-                            Profitable Production
-                        </div>
-                    ) : (
-                        <div className="bg-[#f43f5e]/10 border border-[#f43f5e]/30 text-[#f43f5e] py-3 rounded-xl font-bold uppercase tracking-widest text-xs shadow-[0_0_20px_rgba(244,63,94,0.1)]">
-                            Production Loss
-                        </div>
-                    )}
-                </div>
-
-                {/* Helper nudge when no silver entered yet */}
-                {!hasRevenue && (
-                    <p className="mt-4 text-[10px] text-slate-600 text-center">
-                        Enter actual silver received after selling to see real profit.
-                    </p>
-                )}
+                {/* Profit reminder */}
+                <p className="mt-5 text-center text-[10px] text-slate-600">
+                    Profit is calculated after entering actual silver received in the saved session below.
+                </p>
             </div>
         </div>
     );

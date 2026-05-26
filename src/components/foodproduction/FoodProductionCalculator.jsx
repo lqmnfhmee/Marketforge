@@ -73,7 +73,6 @@ function FoodProductionCalculator() {
     ----------------------------- */
     const [itemName, setItemName] = useState("");
     const [craftedAmount, setCraftedAmount] = useState(0);
-    const [actualSilverReceived, setActualSilverReceived] = useState(0);
 
 
     const addIngredient =
@@ -145,69 +144,77 @@ function FoodProductionCalculator() {
     const totalExpenses = farmingCost + craftingCost;
 
     /* -----------------------------
-       Profit  (real silver, no tax simulation)
-    ----------------------------- */
-
-    const profit = Number(actualSilverReceived || 0) - totalExpenses;
-
-    const roi =
-        totalExpenses > 0
-            ? ((profit / totalExpenses) * 100).toFixed(1)
-            : 0;
-
-    /* -----------------------------
        Actions
     ----------------------------- */
     const handleSaveSession = async () => {
+        if (!itemName.trim()) {
+            toast.error("Please enter a product name before saving.");
+            return;
+        }
+
         const newSession = {
-            item_name: itemName,
-            crafted_amount: craftedAmount,
-            baby_animal_cost: babyAnimalCost,
-            food_cost: foodCost,
-            seed_cost: seedCost,
-            travel_cost: travelCost,
-            butcher_fee: butcherFee,
-            cook_fee: cookFee,
+            item_name: itemName.trim(),
+            crafted_amount: Number(craftedAmount) || 0,
+            baby_animal_cost: Number(babyAnimalCost) || 0,
+            food_cost: Number(foodCost) || 0,
+            seed_cost: Number(seedCost) || 0,
+            travel_cost: Number(travelCost) || 0,
+            butcher_fee: Number(butcherFee) || 0,
+            cook_fee: Number(cookFee) || 0,
             farming_expenses: farmingCost,
             crafting_expenses: craftingCost,
-            ingredients,
-            actual_silver_received: actualSilverReceived,
+            ingredients: ingredients,          // stored as jsonb in Supabase
             total_expenses: totalExpenses,
-            profit,
-            created_at: new Date().toISOString()
+            sale_status: "pending",
+            actual_silver_received: null,
+            profit: null,
         };
-        
-        const loadingToast = toast.loading("Saving session...");
-        
+
+        const loadingToast = toast.loading("Saving production session...");
+
         const { data, error } = await supabase
             .from("food_production_sessions")
             .insert([newSession])
-            .select();
+            .select()
+            .single();
 
         toast.dismiss(loadingToast);
 
         if (error) {
-            console.error("Error saving session:", error);
-            showToast("Failed to save session", true);
-        } else if (data && data.length > 0) {
-            setSessions([data[0], ...sessions]);
-            showToast("Session saved successfully!");
+            console.error("Supabase insert error:", error);
+            toast.error(`Failed to save production session. ${error.message || ""}`);
+            return;
         }
+
+        // Prepend returned row (with server-assigned id + created_at) to state
+        setSessions((prev) => [data, ...prev]);
+        toast.success("Production session saved!");
+
+        // Clear the form so it's ready for the next production run
+        setItemName("");
+        setCraftedAmount(0);
+        setBabyAnimalCost(0);
+        setFoodCost(0);
+        setSeedCost(0);
+        setTravelCost(0);
+        setButcherFee(0);
+        setCookFee(0);
+        setIngredients([]);
     };
 
+
     const loadSession = (session) => {
-        setItemName(session.item_name || session.itemName || "");
-        setCraftedAmount(session.crafted_amount || session.craftedAmount || 0);
-        setBabyAnimalCost(session.baby_animal_cost || session.babyAnimalCost || 0);
-        setFoodCost(session.food_cost || session.foodCost || 0);
-        setSeedCost(session.seed_cost || session.seedCost || 0);
-        setTravelCost(session.travel_cost || session.travelCost || 0);
-        setButcherFee(session.butcher_fee || session.butcherFee || 0);
-        setCookFee(session.cook_fee || session.cookFee || 0);
+        setItemName(session.item_name || "");
+        setCraftedAmount(session.crafted_amount || 0);
+        setBabyAnimalCost(session.baby_animal_cost || 0);
+        setFoodCost(session.food_cost || 0);
+        setSeedCost(session.seed_cost || 0);
+        setTravelCost(session.travel_cost || 0);
+        setButcherFee(session.butcher_fee || 0);
+        setCookFee(session.cook_fee || 0);
         setIngredients(session.ingredients || []);
-        setActualSilverReceived(session.actual_silver_received || 0);
         window.scrollTo({ top: 0, behavior: "smooth" });
-        showToast("Session loaded successfully!");
+        showToast("Session loaded!");
     };
 
     const handleOpenModal = (type) => {
@@ -343,23 +350,20 @@ function FoodProductionCalculator() {
                     setItemName={setItemName}
                     craftedAmount={craftedAmount}
                     setCraftedAmount={setCraftedAmount}
-                    actualSilverReceived={actualSilverReceived}
-                    setActualSilverReceived={setActualSilverReceived}
                 />
 
                 <ProfitSummary
-                    profit={profit}
-                    roi={roi}
+                    farmingCost={farmingCost}
+                    craftingCost={craftingCost}
                     totalExpenses={totalExpenses}
-                    actualSilverReceived={actualSilverReceived}
                 />
 
             </div>
 
         </div>
 
-        {/* Saved Sessions Section */}
-        <SavedSessions sessions={sessions} setSessions={setSessions} onLoadSession={loadSession} />
+        {/* Production Sessions */}
+        <SavedSessions sessions={sessions} setSessions={setSessions} />
 
         {/* Modal */}
         <SubmitModal 
