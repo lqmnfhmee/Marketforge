@@ -13,6 +13,7 @@ import {
   ShieldAlert,
   GitFork,
   Hammer,
+  LayoutGrid,
 } from "lucide-react";
 
 // ─── Reusable input field ────────────────────────────────────────────────────
@@ -173,9 +174,14 @@ function ProductionPlanner() {
 
   // ── Simulation Calculations ───────────────────────────────────────
 
-  // Core breeding simulation metric
+  // Infrastructure scaling: 1 kennel = 4 cages (Albion breeding mechanics)
+  const totalCages = Number(kennelCount || 0) * 4;
+
+  // Core breeding simulation metric — driven by total cages, not raw kennels
   const expectedOutputs =
-    Number(kennelCount || 0) * (Number(successRate || 0) / 100);
+    totalCages * (Number(successRate || 0) / 100);
+
+  const failedRaises = totalCages - expectedOutputs;
 
   // Strategy-branched revenue
   const grossRevenue = isCraftMount
@@ -190,7 +196,7 @@ function ProductionPlanner() {
     Number(foodUnitPrice || 0) * totalFoodNeeded;
 
   const investment =
-    Number(babyPrice || 0) * Number(kennelCount || 0);
+    Number(babyPrice || 0) * totalCages;  // one baby per cage
 
   // Crafting cost only applies when strategy = craft_mount
   const totalMountCraftingCost = isCraftMount
@@ -472,6 +478,106 @@ function ProductionPlanner() {
                   </div>
                 </div>
               </SectionCard>
+
+              {/* ── Production Summary ── */}
+              <SectionCard icon={LayoutGrid} title="Production Summary">
+
+                {/* Header label */}
+                <p className="text-[11px] uppercase tracking-widest text-slate-600 font-semibold -mt-1 mb-1">
+                  Operational Overview
+                </p>
+
+                {/* Summary rows */}
+                {[
+                  {
+                    label: "Islands",
+                    value: Number(islandCount || 0) || "—",
+                    unit: "islands",
+                  },
+                  {
+                    label: "Kennels",
+                    value: Number(kennelCount || 0) || "—",
+                    unit: "kennels",
+                  },
+                  {
+                    label: "Total Cages",
+                    value: totalCages || "—",
+                    unit: "cages",
+                    highlight: true,
+                  },
+                  {
+                    label: "Animals Placed",
+                    value: totalCages || "—",
+                    unit: "animals",
+                  },
+                  {
+                    label: "Expected Successful Raises",
+                    value:
+                      expectedOutputs > 0
+                        ? expectedOutputs % 1 === 0
+                          ? expectedOutputs
+                          : expectedOutputs.toFixed(1)
+                        : "—",
+                    unit: "animals",
+                    positive: true,
+                  },
+                  {
+                    label: "Estimated Breeding Failures",
+                    value:
+                      totalCages > 0
+                        ? failedRaises.toFixed(1)
+                        : "—",
+                    unit: "animals",
+                    negative: true,
+                  },
+                  {
+                    label: "Estimated Outputs",
+                    value:
+                      expectedOutputs > 0
+                        ? expectedOutputs % 1 === 0
+                          ? expectedOutputs
+                          : expectedOutputs.toFixed(1)
+                        : "—",
+                    unit: isCraftMount ? "mounts" : "adults",
+                    highlight: true,
+                  },
+                  {
+                    label: "Cycle Duration",
+                    value: Number(cycleDuration || 0) || "—",
+                    unit: "days",
+                  },
+                ].map(({ label, value, unit, highlight, positive, negative }) => (
+                  <div
+                    key={label}
+                    className="flex items-center justify-between py-2.5 border-b border-[rgba(255,255,255,0.04)] last:border-0"
+                  >
+                    <span
+                      className={`text-sm ${
+                        highlight ? "text-slate-300 font-medium" : "text-slate-500"
+                      }`}
+                    >
+                      {label}
+                    </span>
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={`text-sm font-semibold tabular-nums ${
+                          positive
+                            ? "text-emerald-400"
+                            : negative
+                            ? "text-rose-400"
+                            : highlight
+                            ? "text-[#fbbf24]"
+                            : "text-slate-300"
+                        }`}
+                        style={{ fontFamily: "'Cinzel', serif" }}
+                      >
+                        {value}
+                      </span>
+                      <span className="text-[10px] text-slate-600">{unit}</span>
+                    </div>
+                  </div>
+                ))}
+              </SectionCard>
             </div>
 
             {/* ─── RIGHT: Results ────────────────────────────────────── */}
@@ -498,7 +604,7 @@ function ProductionPlanner() {
                       Expected Outputs
                     </p>
                     <p className="text-[10px] text-slate-600 mt-0.5">
-                      Kennels × Success Rate
+                      Total Cages × Success Rate
                     </p>
                   </div>
                 </div>
@@ -515,20 +621,20 @@ function ProductionPlanner() {
                   <div className="text-right">
                     <p className="text-xs text-slate-600 mb-1">from</p>
                     <p className="text-sm font-semibold text-slate-400">
-                      {Number(kennelCount || 0)} kennels
+                      {totalCages} cages
                     </p>
                     <p className="text-[11px] text-slate-600">
-                      @ {rateNum}% rate
+                      ({Number(kennelCount || 0)} kennels × 4) @ {rateNum}%
                     </p>
                   </div>
                 </div>
 
-                {/* Lost outputs indicator */}
-                {Number(kennelCount) > 0 && (
+                {/* Failed raises indicator */}
+                {totalCages > 0 && (
                   <div className="mt-4 pt-4 border-t border-[rgba(255,255,255,0.04)]">
                     <p className="text-[11px] text-slate-600">
                       <span className="text-rose-500 font-semibold">
-                        {(Number(kennelCount) - expectedOutputs).toFixed(1)}
+                        {failedRaises.toFixed(1)}
                       </span>
                       {" "}expected breeding failures this cycle
                     </p>
