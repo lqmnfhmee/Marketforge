@@ -11,6 +11,8 @@ import {
   PawPrint,
   ClipboardList,
   ShieldAlert,
+  GitFork,
+  Hammer,
 } from "lucide-react";
 
 // ─── Reusable input field ────────────────────────────────────────────────────
@@ -149,18 +151,25 @@ function ConfidencePill({ rate }) {
 // ─── Main page ────────────────────────────────────────────────────────────────
 function ProductionPlanner() {
 
+  // ── Strategy ──────────────────────────────────────────────────────
+  // "sell_adult" → sell the raised animal directly
+  // "craft_mount" → craft into a mount then sell
+  const [strategy, setStrategy] = useState("craft_mount");
+  const isCraftMount = strategy === "craft_mount";
+
   // ── Market Variables ──────────────────────────────────────────────
-  const [babyPrice, setBabyPrice]       = useState("");
-  const [adultPrice, setAdultPrice]     = useState(""); // kept for future use
-  const [mountPrice, setMountPrice]     = useState("");
-  const [foodUnitPrice, setFoodUnitPrice] = useState("");   // price of ONE food item
-  const [foodPerAnimal, setFoodPerAnimal] = useState("");   // units needed to raise one animal
+  const [babyPrice, setBabyPrice]             = useState("");
+  const [adultPrice, setAdultPrice]           = useState("");  // sell_adult path
+  const [mountPrice, setMountPrice]           = useState("");  // craft_mount path
+  const [mountCraftingCost, setMountCraftingCost] = useState(""); // craft_mount only
+  const [foodUnitPrice, setFoodUnitPrice]     = useState("");  // price of ONE food item
+  const [foodPerAnimal, setFoodPerAnimal]     = useState("");  // units needed per animal
 
   // ── Infrastructure ────────────────────────────────────────────────
-  const [islandCount, setIslandCount]   = useState("");
-  const [kennelCount, setKennelCount]   = useState("");
+  const [islandCount, setIslandCount]     = useState("");
+  const [kennelCount, setKennelCount]     = useState("");
   const [cycleDuration, setCycleDuration] = useState("");
-  const [successRate, setSuccessRate]   = useState("85");   // default 85%
+  const [successRate, setSuccessRate]     = useState("85");   // default 85%
 
   // ── Simulation Calculations ───────────────────────────────────────
 
@@ -168,11 +177,12 @@ function ProductionPlanner() {
   const expectedOutputs =
     Number(kennelCount || 0) * (Number(successRate || 0) / 100);
 
-  // Revenue now driven by realistic expected outputs, not raw kennel count
-  const grossRevenue =
-    Number(mountPrice || 0) * expectedOutputs;
+  // Strategy-branched revenue
+  const grossRevenue = isCraftMount
+    ? Number(mountPrice || 0) * expectedOutputs      // sell crafted mounts
+    : Number(adultPrice || 0) * expectedOutputs;     // sell adult animals directly
 
-  // Total food items consumed across the entire operation (based on realistic output, not raw kennels)
+  // Total food items consumed (anchored to realistic output, not raw kennels)
   const totalFoodNeeded =
     Number(foodPerAnimal || 0) * expectedOutputs;
 
@@ -182,7 +192,12 @@ function ProductionPlanner() {
   const investment =
     Number(babyPrice || 0) * Number(kennelCount || 0);
 
-  const netProfit = grossRevenue - foodCost - investment;
+  // Crafting cost only applies when strategy = craft_mount
+  const totalMountCraftingCost = isCraftMount
+    ? Number(mountCraftingCost || 0) * expectedOutputs
+    : 0;
+
+  const netProfit = grossRevenue - foodCost - investment - totalMountCraftingCost;
 
   const roi =
     investment > 0 ? (netProfit / investment) * 100 : 0;
@@ -198,11 +213,15 @@ function ProductionPlanner() {
   const pdTone =
     profitPerDay === 0 ? "neutral" : profitPerDay > 0 ? "positive" : "negative";
 
-  // Break-even: minimum sell price per output to cover all costs
+  // Break-even: minimum sell price per output to recover all costs (strategy-aware)
+  const totalCosts = foodCost + investment + totalMountCraftingCost;
   const breakEvenPrice =
-    expectedOutputs > 0 ? (foodCost + investment) / expectedOutputs : 0;
+    expectedOutputs > 0 ? totalCosts / expectedOutputs : 0;
 
-  const currentMarketPrice = Number(mountPrice || 0);
+  // Compare against the sell price for the active strategy
+  const currentMarketPrice = isCraftMount
+    ? Number(mountPrice || 0)
+    : Number(adultPrice || 0);
   const marketAboveBreakEven =
     currentMarketPrice > 0 && breakEvenPrice > 0 && currentMarketPrice > breakEvenPrice;
   const marketBelowBreakEven =
@@ -210,7 +229,7 @@ function ProductionPlanner() {
   const marketAtBreakEven =
     currentMarketPrice > 0 && breakEvenPrice > 0 && currentMarketPrice === breakEvenPrice;
 
-  // Safety margin: how much the current price exceeds break-even (%)
+  // Safety margin: how much the current sell price exceeds break-even (%)
   const safetyMarginPct =
     breakEvenPrice > 0 && currentMarketPrice > 0
       ? ((currentMarketPrice - breakEvenPrice) / breakEvenPrice) * 100
@@ -260,6 +279,46 @@ function ProductionPlanner() {
 
               {/* Market Variables */}
               <SectionCard icon={ShoppingCart} title="Market Variables">
+
+                {/* ── Production Strategy selector ── */}
+                <div className="pb-2 border-b border-[rgba(251,191,36,0.06)]">
+                  <div className="flex items-center gap-2 mb-3">
+                    <GitFork size={13} className="text-[#fbbf24]" />
+                    <span className="text-[11px] uppercase tracking-widest text-[#fbbf24] font-semibold">
+                      Production Strategy
+                    </span>
+                  </div>
+                  <div className="relative">
+                    <select
+                      value={strategy}
+                      onChange={(e) => setStrategy(e.target.value)}
+                      className="
+                        w-full bg-[#0b101c] border border-[rgba(251,191,36,0.1)] rounded-xl
+                        px-4 py-3 text-slate-200 text-sm appearance-none cursor-pointer
+                        focus:outline-none focus:border-[rgba(251,191,36,0.4)] focus:ring-1 focus:ring-[rgba(251,191,36,0.15)]
+                        transition-all duration-200
+                      "
+                      style={{ fontFamily: "'Inter', sans-serif" }}
+                    >
+                      <option value="sell_adult">Sell Adult Animal</option>
+                      <option value="craft_mount">Craft Mount</option>
+                    </select>
+                    {/* chevron */}
+                    <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-500">
+                      ▾
+                    </span>
+                  </div>
+                  {/* Strategy description badge */}
+                  <div className="mt-2 flex items-center gap-2 px-3 py-2 rounded-lg bg-[#111827]/60 border border-[rgba(255,255,255,0.04)]">
+                    <span className="text-[10px] text-slate-500">
+                      {isCraftMount
+                        ? "Revenue = mount sell price × expected outputs. Includes crafting cost."
+                        : "Revenue = adult animal price × expected outputs. Lower cost, faster cycle."}
+                    </span>
+                  </div>
+                </div>
+
+                {/* ── Prices: conditionally rendered per strategy ── */}
                 <SimInput
                   label="Baby Animal Price"
                   placeholder="e.g. 15,000"
@@ -267,13 +326,53 @@ function ProductionPlanner() {
                   onChange={setBabyPrice}
                   unit="silver"
                 />
-                <SimInput
-                  label="Mount / Adult Sell Price"
-                  placeholder="e.g. 120,000"
-                  value={mountPrice}
-                  onChange={setMountPrice}
-                  unit="silver"
-                />
+
+                {isCraftMount ? (
+                  <>
+                    <SimInput
+                      label="Mount Sell Price"
+                      placeholder="e.g. 120,000"
+                      value={mountPrice}
+                      onChange={setMountPrice}
+                      unit="silver"
+                    />
+                    {/* Mount Crafting Cost — only for craft_mount */}
+                    <div className="flex flex-col gap-1.5">
+                      <div className="flex items-center gap-1.5">
+                        <Hammer size={11} className="text-rose-400" />
+                        <label className="text-[11px] font-semibold uppercase tracking-widest text-slate-500">
+                          Mount Crafting Cost
+                        </label>
+                      </div>
+                      <div className="relative">
+                        <input
+                          type="number"
+                          placeholder="e.g. 5,000"
+                          value={mountCraftingCost}
+                          onChange={(e) => setMountCraftingCost(e.target.value)}
+                          className="
+                            w-full bg-[#0b101c] border border-[rgba(248,113,113,0.15)] rounded-xl
+                            px-4 py-3 text-slate-200 placeholder-slate-600 text-sm
+                            focus:outline-none focus:border-[rgba(248,113,113,0.4)] focus:ring-1 focus:ring-[rgba(248,113,113,0.1)]
+                            transition-all duration-200
+                          "
+                          style={{ fontFamily: "'Inter', sans-serif" }}
+                        />
+                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-500 pointer-events-none select-none">
+                          silver
+                        </span>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <SimInput
+                    label="Adult Animal Sell Price"
+                    placeholder="e.g. 45,000"
+                    value={adultPrice}
+                    onChange={setAdultPrice}
+                    unit="silver"
+                  />
+                )}
 
                 {/* ── Food consumption modelling ── */}
                 <div className="pt-2 border-t border-[rgba(251,191,36,0.06)]">
@@ -441,7 +540,11 @@ function ProductionPlanner() {
               <SectionCard icon={Utensils} title="Production Results">
                 <ResultMetric
                   label="Gross Revenue"
-                  sublabel="mount price × expected outputs"
+                  sublabel={
+                    isCraftMount
+                      ? "mount sell price × expected outputs"
+                      : "adult sell price × expected outputs"
+                  }
                   value={grossRevenue.toLocaleString()}
                   tone="neutral"
                 />
@@ -461,6 +564,14 @@ function ProductionPlanner() {
                   value={foodCost.toLocaleString()}
                   tone={foodCost > 0 ? "negative" : "neutral"}
                 />
+                {isCraftMount && (
+                  <ResultMetric
+                    label="Mount Crafting Cost"
+                    sublabel="crafting cost × expected outputs"
+                    value={totalMountCraftingCost.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                    tone={totalMountCraftingCost > 0 ? "negative" : "neutral"}
+                  />
+                )}
                 <ResultMetric
                   label="Investment"
                   sublabel="baby price × kennels"
@@ -547,7 +658,9 @@ function ProductionPlanner() {
                         Break-Even Analysis
                       </p>
                       <p className="text-[10px] text-slate-600 mt-0.5">
-                        (food cost + investment) ÷ expected outputs
+                        {isCraftMount
+                          ? "(food + crafting + investment) ÷ expected outputs"
+                          : "(food + investment) ÷ expected outputs"}
                       </p>
                     </div>
                   </div>
