@@ -262,7 +262,7 @@ function ProductionPlanner() {
                   className="text-2xl sm:text-3xl font-bold tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-[#fbbf24] to-[#d97706]"
                   style={{ fontFamily: "'Cinzel', serif" }}
                 >
-                  Production Planner
+                  Swiftclaw Production
                 </h1>
               </div>
               <p className="text-slate-500 text-sm ml-1">

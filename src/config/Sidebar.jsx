@@ -41,7 +41,7 @@ function Sidebar() {
       title: "PRODUCTION",
       items: [
         { icon: ChefHat, label: "Food Prod.", path: "/food-production" },
-        { icon: ClipboardList, label: "Prod. Planner", path: "/production-planner" },
+        { icon: ClipboardList, label: "Swiftclaw", path: "/production-planner" },
       ]
     },
     {
