@@ -6,7 +6,8 @@ import {
   LogOut,
   Menu,
   X,
-  User
+  User,
+  ClipboardList
 } from "lucide-react";
 
 import { useAuth } from "../components/context/AuthContext";
@@ -40,6 +41,7 @@ function Sidebar() {
       title: "PRODUCTION",
       items: [
         { icon: ChefHat, label: "Food Prod.", path: "/food-production" },
+        { icon: ClipboardList, label: "Prod. Planner", path: "/production-planner" },
       ]
     },
     {

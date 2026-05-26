@@ -10,6 +10,7 @@ import Dashboard from "../pages/Dashboard";
 import LoginPage from "../pages/LoginPage";
 import RegisterPage from "../pages/RegisterPage";
 import ForgotPasswordPage from "../pages/ForgotPasswordPage";
+import ProductionPlanner from "../pages/ProductionPlanner";
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
@@ -69,7 +70,11 @@ function AppRoutes() {
           <FoodProductionPage />
         </ProtectedRoute>
       } />
-
+      <Route path="/production-planner" element={
+        <ProtectedRoute>
+          <ProductionPlanner />
+        </ProtectedRoute>
+      } />
       {/* Fallback Redirect */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
