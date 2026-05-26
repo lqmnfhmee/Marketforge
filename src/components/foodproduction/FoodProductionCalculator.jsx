@@ -71,26 +71,10 @@ function FoodProductionCalculator() {
     /* -----------------------------
        Selling
     ----------------------------- */
+    const [itemName, setItemName] = useState("");
+    const [craftedAmount, setCraftedAmount] = useState(0);
+    const [actualSilverReceived, setActualSilverReceived] = useState(0);
 
-    const [itemName,
-        setItemName] =
-        useState("");
-
-    const [craftedAmount,
-        setCraftedAmount] =
-        useState(0);
-
-    const [marketListings,
-        setMarketListings] =
-        useState([]);
-
-    const [premium,
-        setPremium] =
-        useState(false);
-
-    /* -----------------------------
-       Ingredient Logic
-    ----------------------------- */
 
     const addIngredient =
         () => {
@@ -136,58 +120,6 @@ function FoodProductionCalculator() {
         };
 
     /* -----------------------------
-       Market Listings
-    ----------------------------- */
-
-    const addListing =
-        () => {
-
-            setMarketListings(
-                (prev) => [
-                    ...prev,
-                    {
-                        city: "",
-                        amount: 0,
-                        price: 0,
-                    },
-                ]
-            );
-
-        };
-
-    const updateListing =
-        (
-            index,
-            field,
-            value
-        ) => {
-
-            const updated =
-                [...marketListings];
-
-            updated[index][field] =
-                field === "city"
-                    ? value
-                    : Number(value);
-
-            setMarketListings(
-                updated
-            );
-        };
-
-    const removeListing =
-        (index) => {
-
-            setMarketListings(
-                marketListings.filter(
-                    (_, i) =>
-                        i !== index
-                )
-            );
-
-        };
-
-    /* -----------------------------
        Calculations
     ----------------------------- */
 
@@ -210,77 +142,17 @@ function FoodProductionCalculator() {
         Number(cookFee) +
         ingredientTotal;
 
-    const totalExpenses =
-        farmingCost +
-        craftingCost;
+    const totalExpenses = farmingCost + craftingCost;
 
     /* -----------------------------
-       Marketplace Tax
+       Profit  (real silver, no tax simulation)
     ----------------------------- */
 
-    const taxRate =
-        premium ? 0.04 : 0.065;
-
-    /* -----------------------------
-       Revenue
-    ----------------------------- */
-
-    const grossRevenue =
-        marketListings.reduce(
-            (acc, listing) =>
-                acc +
-                (
-                    listing.amount *
-                    listing.price
-                ),
-            0
-        );
-
-    const marketplaceTax =
-        grossRevenue * taxRate;
-
-    const netRevenue =
-        grossRevenue -
-        marketplaceTax;
-
-    /* -----------------------------
-       Profit
-    ----------------------------- */
-
-    const profit =
-        netRevenue -
-        totalExpenses;
-
-    /* -----------------------------
-       Distribution Tracking
-    ----------------------------- */
-
-    const usedAmount =
-        marketListings.reduce(
-            (acc, listing) =>
-                acc +
-                listing.amount,
-            0
-        );
-
-    const remainingAmount =
-        craftedAmount -
-        usedAmount;
-
-    const oversold =
-        remainingAmount < 0;
-
-    /* -----------------------------
-       ROI
-    ----------------------------- */
+    const profit = Number(actualSilverReceived || 0) - totalExpenses;
 
     const roi =
         totalExpenses > 0
-            ? (
-                (profit /
-                    totalExpenses) *
-                100
-            ).toFixed(1)
+            ? ((profit / totalExpenses) * 100).toFixed(1)
             : 0;
 
     /* -----------------------------
@@ -299,11 +171,8 @@ function FoodProductionCalculator() {
             farming_expenses: farmingCost,
             crafting_expenses: craftingCost,
             ingredients,
-            market_listings: marketListings,
-            premium,
+            actual_silver_received: actualSilverReceived,
             total_expenses: totalExpenses,
-            gross_revenue: grossRevenue,
-            net_revenue: netRevenue,
             profit,
             created_at: new Date().toISOString()
         };
@@ -329,25 +198,15 @@ function FoodProductionCalculator() {
     const loadSession = (session) => {
         setItemName(session.item_name || session.itemName || "");
         setCraftedAmount(session.crafted_amount || session.craftedAmount || 0);
-        
         setBabyAnimalCost(session.baby_animal_cost || session.babyAnimalCost || 0);
         setFoodCost(session.food_cost || session.foodCost || 0);
         setSeedCost(session.seed_cost || session.seedCost || 0);
         setTravelCost(session.travel_cost || session.travelCost || 0);
-        
         setButcherFee(session.butcher_fee || session.butcherFee || 0);
         setCookFee(session.cook_fee || session.cookFee || 0);
-        
         setIngredients(session.ingredients || []);
-        setMarketListings(session.market_listings || session.marketListings || []);
-        
-        setPremium(session.premium || false);
-        
-        window.scrollTo({
-            top: 0,
-            behavior: "smooth"
-        });
-        
+        setActualSilverReceived(session.actual_silver_received || 0);
+        window.scrollTo({ top: 0, behavior: "smooth" });
         showToast("Session loaded successfully!");
     };
 
@@ -481,78 +340,18 @@ function FoodProductionCalculator() {
 
                 <SellingSetup
                     itemName={itemName}
-
-                    setItemName={
-                        setItemName
-                    }
-
-                    craftedAmount={
-                        craftedAmount
-                    }
-
-                    setCraftedAmount={
-                        setCraftedAmount
-                    }
-
-                    marketListings={
-                        marketListings
-                    }
-
-                    addListing={
-                        addListing
-                    }
-
-                    updateListing={
-                        updateListing
-                    }
-
-                    removeListing={
-                        removeListing
-                    }
-
-                    premium={premium}
-
-                    setPremium={
-                        setPremium
-                    }
-
-                    grossRevenue={
-                        grossRevenue
-                    }
-
-                    marketplaceTax={
-                        marketplaceTax
-                    }
-
-                    netRevenue={
-                        netRevenue
-                    }
-
-                    usedAmount={
-                        usedAmount
-                    }
-
-                    remainingAmount={
-                        remainingAmount
-                    }
-
-                    oversold={
-                        oversold
-                    }
+                    setItemName={setItemName}
+                    craftedAmount={craftedAmount}
+                    setCraftedAmount={setCraftedAmount}
+                    actualSilverReceived={actualSilverReceived}
+                    setActualSilverReceived={setActualSilverReceived}
                 />
 
                 <ProfitSummary
                     profit={profit}
-
                     roi={roi}
-
-                    totalExpenses={
-                        totalExpenses
-                    }
-
-                    netRevenue={
-                        netRevenue
-                    }
+                    totalExpenses={totalExpenses}
+                    actualSilverReceived={actualSilverReceived}
                 />
 
             </div>
